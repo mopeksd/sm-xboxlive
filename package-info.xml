@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+  <name>SimpleXBL</name>
+  <id>jasonclemons:SimpleXBL</id>
+  <version>1.0</version>
+  <type>modification</type>
+  <install for="2.1">
+    <readme>readme.md</readme>
+    <modification>install.xml</modification>
+    <require-file name="source/SimpleXBL.php" destination="$sourcedir" />
+    <require-file name="source/Subs-SimpleXBL.php" destination="$sourcedir" />
+    <require-file name="source/Manage-SimpleXBL.php" destination="$sourcedir" />
+    <require-file name="template/SimpleXBL.template.php" destination="$themedir" />
+    <require-file name="language/SimpleXBL.english.php" destination="$languagedir" />
+    <require-file name="language/SimpleXBL.english-utf8.php" destination="$languagedir" />
+  </install>
+  <uninstall for="2.1">
+    <modification>uninstall.xml</modification>
+    <remove-file name="$sourcedir/SimpleXBL.php" />
+    <remove-file name="$sourcedir/Subs-SimpleXBL.php" />
+    <remove-file name="$sourcedir/ManageSimpleXBL.php" />
+    <remove-file name="$themedir/SimpleXBL.template.php" />
+    <remove-file name="$languagedir/SimpleXBL.english.php" />
+    <remove-file name="$languagedir/SimpleXBL.english-utf8.php" />
+  </uninstall>
+</package-info>
