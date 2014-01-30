@@ -8,6 +8,7 @@
   <install for="2.1">
     <readme>readme.md</readme>
     <modification>install.xml</modification>
+    <database>lib/db_install.php</database>
     <require-file name="source/SimpleXBL.php" destination="$sourcedir" />
     <require-file name="source/Subs-SimpleXBL.php" destination="$sourcedir" />
     <require-file name="source/Manage-SimpleXBL.php" destination="$sourcedir" />
@@ -17,6 +18,7 @@
   </install>
   <uninstall for="2.1">
     <modification>uninstall.xml</modification>
+    <database>lib/db_uninstall.php</database>
     <remove-file name="$sourcedir/SimpleXBL.php" />
     <remove-file name="$sourcedir/Subs-SimpleXBL.php" />
     <remove-file name="$sourcedir/ManageSimpleXBL.php" />
