@@ -1,7 +1,8 @@
 <?php
 /**
-* This file contains all English language strings. It is
-* located in ./Themes/default/language/SimpleXBL.english.php
+* This file contains all English language strings. All strings in
+* this file are UTF-8 encoded. It is located in
+* ./Themes/languages/SimpleXBL.english-utf8.php
 *
 * @package    SMF
 * @author     Jason Clemons <jason@xboxleaders.com>
