@@ -12,7 +12,3 @@
 * @link       https://github.com/jasonclemons/SimpleXBL
 * @since      File available since 1.0
 */
-
-if (!defined('SMF')) {
-  die('Hacking attempt...');
-}
