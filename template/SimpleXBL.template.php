@@ -3,7 +3,7 @@
 
 function template_leaderboard()
 {
-	global $context, $scripturl, $txt, $settings;
+    global $context, $scripturl, $txt, $settings;
 
     // Show a success message if we've deleted a gamertag
     if (!empty($_GET['deleted']) && $_GET['deleted'] == true)
@@ -15,12 +15,12 @@ function template_leaderboard()
     }
 
     // Show the leaderboard in all its glory
-	template_show_list('xbl_leaders');
+    template_show_list('xbl_leaders');
 
-	echo '
-	<br class="clear" />
-	<span class="clear upperframe"><span></span></span>
-	<div class="roundframe">
+    echo '
+    <br class="clear" />
+    <span class="clear upperframe"><span></span></span>
+    <div class="roundframe">
         <div class="innerframe">
             <div class="cat_bar">
                 <h3 class="catbg">
@@ -97,42 +97,42 @@ function template_leaderboard()
             </div>
         </div>
     </div>
-	<span class="lowerframe"><span></span></span>';
+    <span class="lowerframe"><span></span></span>';
 
-	echo '
-	<div class="smalltext" align="center">
-		<a href="https://github.com/jasonclemons/SimpleXBL">SimpleXBL</a> v', $context['xbl_version'], '
-	</div>';
+    echo '
+    <div class="smalltext" align="center">
+        <a href="https://github.com/jasonclemons/SimpleXBL">SimpleXBL</a> v', $context['xbl_version'], '
+    </div>';
 
-	echo '
-	<script type="text/javascript"><!-- // --><![CDATA[
-		var oXblStatsToggle = new smc_Toggle({
-			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($options['collapse_header_xbls']) ? 'false' : 'true', ',
-			aSwappableContainers: [
-				\'upshrinkHeaderXBLS\'
-			],
-			aSwapImages: [
-				{
-					sId: \'upshrink_xbls\',
-					srcExpanded: smf_images_url + \'/collapse.gif\',
-					altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-					srcCollapsed: smf_images_url + \'/expand.gif\',
-					altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
-				}
-			],
-			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-				sOptionName: \'collapse_header_xbls\',
-				sSessionVar: ', JavaScriptEscape($context['session_var']), ',
-				sSessionId: ', JavaScriptEscape($context['session_id']), '
-			},
-			oCookieOptions: {
-				bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
-				sCookieName: \'upshrinkXBLS\'
-			}
-		});
-	// ]]></script>';
+    echo '
+    <script type="text/javascript"><!-- // --><![CDATA[
+        var oXblStatsToggle = new smc_Toggle({
+            bToggleEnabled: true,
+            bCurrentlyCollapsed: ', empty($options['collapse_header_xbls']) ? 'false' : 'true', ',
+            aSwappableContainers: [
+                \'upshrinkHeaderXBLS\'
+            ],
+            aSwapImages: [
+                {
+                    sId: \'upshrink_xbls\',
+                    srcExpanded: smf_images_url + \'/collapse.gif\',
+                    altExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
+                    srcCollapsed: smf_images_url + \'/expand.gif\',
+                    altCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
+                }
+            ],
+            oThemeOptions: {
+                bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+                sOptionName: \'collapse_header_xbls\',
+                sSessionVar: ', JavaScriptEscape($context['session_var']), ',
+                sSessionId: ', JavaScriptEscape($context['session_id']), '
+            },
+            oCookieOptions: {
+                bUseCookie: ', $context['user']['is_guest'] ? 'true' : 'false', ',
+                sCookieName: \'upshrinkXBLS\'
+            }
+        });
+    // ]]></script>';
 
 }
 
