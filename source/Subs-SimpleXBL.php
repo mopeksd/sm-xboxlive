@@ -22,29 +22,29 @@ if (!defined('SMF'))
  */
 function sxblMenuButtons(&$menu_buttons)
 {
-	global $scripturl, $txt, $modSettings;
+    global $scripturl, $txt, $modSettings;
 
-	$find = 0;
-	reset($menu_buttons);
+    $find = 0;
+    reset($menu_buttons);
 
-	while((list($key, $val) = each($menu_buttons)) && $key != 'calendar')
+    while((list($key, $val) = each($menu_buttons)) && $key != 'calendar')
     {
-		$find++;
-	}
+        $find++;
+    }
 
-	$menu_buttons = array_merge(
-		array_slice($menu_buttons, 0, $find),
-		array(
-			'simplexbl' => array(
-				'title' => $txt['simplexbl'],
-				'href' => $scripturl . '?action=simplexbl',
-				'show' => true,
-				'sub_buttons' => array(
-				),
-			),
-		),
-		array_slice($menu_buttons, $find)
-	);
+    $menu_buttons = array_merge(
+        array_slice($menu_buttons, 0, $find),
+        array(
+            'simplexbl' => array(
+                'title' => $txt['simplexbl'],
+                'href' => $scripturl . '?action=simplexbl',
+                'show' => true,
+                'sub_buttons' => array(
+                ),
+            ),
+        ),
+        array_slice($menu_buttons, $find)
+    );
 }
 
 /**
@@ -53,27 +53,27 @@ function sxblMenuButtons(&$menu_buttons)
  */
 function sxblAdminAreas(&$admin_areas)
 {
-	global $txt, $modSettings;
+    global $txt, $modSettings;
 
-	// We insert it after Features and Options
-	$counter = 0;
-	foreach ($admin_areas['config']['areas'] as $area => $dummy)
+    // We insert it after Features and Options
+    $counter = 0;
+    foreach ($admin_areas['config']['areas'] as $area => $dummy)
     {
-		if (++$counter && $area == 'featuresettings')
-			break;
-	}
+        if (++$counter && $area == 'featuresettings')
+            break;
+    }
 
-	$admin_areas['config']['areas'] = array_merge(
-		array_slice($admin_areas['config']['areas'], 0, $counter, TRUE),
-		array('simplexbl' => array(
-			'label' => $txt['simplexbl'],
-			'function' => create_function(NULL, 'ModifySimpleXBLSettings();'),
-			'icon' => 'maintain.gif',
-			'subsections' => array(
-			),
-		)),
-		array_slice($admin_areas['config']['areas'], $counter, NULL, TRUE)
-	);
+    $admin_areas['config']['areas'] = array_merge(
+        array_slice($admin_areas['config']['areas'], 0, $counter, TRUE),
+        array('simplexbl' => array(
+            'label' => $txt['simplexbl'],
+            'function' => create_function(NULL, 'ModifySimpleXBLSettings();'),
+            'icon' => 'maintain.gif',
+            'subsections' => array(
+            ),
+        )),
+        array_slice($admin_areas['config']['areas'], $counter, NULL, TRUE)
+    );
 }
 
 /**
@@ -81,7 +81,7 @@ function sxblAdminAreas(&$admin_areas)
  */
 function sxblActions(&$actionArray)
 {
-	$actionArray['simplexbl'] = array('SimpleXBL.php', 'SimpleXBL');
+    $actionArray['simplexbl'] = array('SimpleXBL.php', 'SimpleXBL');
 }
 
 /**
@@ -89,29 +89,29 @@ function sxblActions(&$actionArray)
  */
 function ModifySimpleXBLSettings()
 {
-	global $txt, $context, $sourcedir;
+    global $txt, $context, $sourcedir;
 
-	require_once($sourcedir . '/ManageSettings.php');
+    require_once($sourcedir . '/ManageSettings.php');
 
-	$context['page_title'] = $txt['simplexbl'];
+    $context['page_title'] = $txt['simplexbl'];
 
-	$subActions = array(
-		'basic' => 'ModifyBasicSXBLSettings',
-	);
+    $subActions = array(
+        'basic' => 'ModifyBasicSXBLSettings',
+    );
 
-	loadGeneralSettingParameters($subActions, 'basic');
+    loadGeneralSettingParameters($subActions, 'basic');
 
-	// Load up all the tabs...
-	$context[$context['admin_menu_name']]['tab_data'] = array(
-		'title' => $txt['simplexbl'],
-		'description' => $txt['simplexbl_desc'],
-		'tabs' => array(
-			'basic' => array(
-			),
-		),
-	);
+    // Load up all the tabs...
+    $context[$context['admin_menu_name']]['tab_data'] = array(
+        'title' => $txt['simplexbl'],
+        'description' => $txt['simplexbl_desc'],
+        'tabs' => array(
+            'basic' => array(
+            ),
+        ),
+    );
 
-	$subActions[$_REQUEST['sa']]();
+    $subActions[$_REQUEST['sa']]();
 }
 
 /**
@@ -119,7 +119,7 @@ function ModifySimpleXBLSettings()
  */
 function sxblLoadTheme()
 {
-	loadLanguage('SimpleXBL');
+    loadLanguage('SimpleXBL');
 }
 
 /**
@@ -127,44 +127,44 @@ function sxblLoadTheme()
  */
 function http($url, $method = 'GET', $parameters = array())
 {
-	// No cURL? No problem.
-	if (!function_exists('curl_init'))
+    // No cURL? No problem.
+    if (!function_exists('curl_init'))
     {
-		if ($method !== 'POST')
+        if ($method !== 'POST')
         {
-			log_error('critical', 'http() - You cannot make POST requests without cURL.');
-			return;
-		}
+            log_error('critical', 'http() - You cannot make POST requests without cURL.');
+            return;
+        }
 
-		$url = $url . '?' . http_build_query($parameters, null, '&');
-		$data = file_get_contents($url);
-		return $data;
-	}
+        $url = $url . '?' . http_build_query($parameters, null, '&');
+        $data = file_get_contents($url);
+        return $data;
+    }
 
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)');
-	curl_setopt($ch, CURLOPT_HEADER, false);
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Trident/4.0)');
+    curl_setopt($ch, CURLOPT_HEADER, false);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-	//!!! This could be better, but it works for now...
-	switch ($method)
+    //!!! This could be better, but it works for now...
+    switch ($method)
     {
-		case 'GET':
-			$url = $url . '?' . http_build_query($parameters, null, '&');
-		break;
-		case 'POST':
-			curl_setopt($ch, CURLOPT_POST, true);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
-		break;
-	}
+        case 'GET':
+            $url = $url . '?' . http_build_query($parameters, null, '&');
+        break;
+        case 'POST':
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
+        break;
+    }
 
-	curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_URL, $url);
 
-	$data = curl_exec($ch);
-	curl_close($ch);
+    $data = curl_exec($ch);
+    curl_close($ch);
 
-	return $data;
+    return $data;
 }
 
 /**
@@ -172,7 +172,7 @@ function http($url, $method = 'GET', $parameters = array())
  */
 function sxbl_clean_string($string)
 {
-	global $context;
+    global $context;
 
     return iconv('UTF-8', !empty($context['character_set']) ? $context['character_set'] . '//IGNORE' : 'ISO-8859-1//IGNORE', $string);
 }
@@ -183,60 +183,60 @@ function sxbl_clean_string($string)
  */
 function sxbl_get_data($data, $member)
 {
-	global $sourcedir, $context, $modSettings, $scripturl;
+    global $sourcedir, $context, $modSettings, $scripturl;
 
-	$player['id'] = $member;
+    $player['id'] = $member;
 
-	if (!is_array($data) || $data === false)
+    if (!is_array($data) || $data === false)
     {
-		return false;
-	}
+        return false;
+    }
     else
     {
-		$player['is_valid']			= $data['status']['is_valid'] === 'yes' ? 1 : 0;
-		$player['account_status']	= $data['status']['tier'] === 'gold' ? 1 : 0;
-		$player['gender']			= $data['profile']['gender'];
-		$player['is_cheater']		= $data['status']['is_cheater'] === 'yes' ? 1 : 0;
-		$player['link']				= $data['profile']['url'];
-		$player['gamertag']			= $data['profile']['gamertag'];
-		$player['avatar']			= $data['profile']['avatar_small'];
-		$player['reputation']		= $data['profile']['reputation'];
-		$player['gamerscore']		= $data['profile']['gamerscore'];
-		$player['location']			= $data['profile']['location'];
-		$player['motto']			= $data['profile']['motto'];
-		$player['name']				= $data['profile']['name'];
-		$player['bio']				= $data['profile']['bio'];
+        $player['is_valid']			= $data['status']['is_valid'] === 'yes' ? 1 : 0;
+        $player['account_status']	= $data['status']['tier'] === 'gold' ? 1 : 0;
+        $player['gender']			= $data['profile']['gender'];
+        $player['is_cheater']		= $data['status']['is_cheater'] === 'yes' ? 1 : 0;
+        $player['link']				= $data['profile']['url'];
+        $player['gamertag']			= $data['profile']['gamertag'];
+        $player['avatar']			= $data['profile']['avatar_small'];
+        $player['reputation']		= $data['profile']['reputation'];
+        $player['gamerscore']		= $data['profile']['gamerscore'];
+        $player['location']			= $data['profile']['location'];
+        $player['motto']			= $data['profile']['motto'];
+        $player['name']				= $data['profile']['name'];
+        $player['bio']				= $data['profile']['bio'];
 
-		if (!empty($data['recent_games']))
+        if (!empty($data['recent_games']))
         {
-			$player['games'] = array();
+            $player['games'] = array();
 
-			foreach ($data['recent_games'] as $key => $val)
+            foreach ($data['recent_games'] as $key => $val)
             {
-				$val['last_played']									= strtotime($val['last_played']);
+                $val['last_played']									= strtotime($val['last_played']);
 
-				$player['games'][$key]['tid']						= $val['tid'];
-				$player['games'][$key]['link']						= $val['marketplace'];
-				$player['games'][$key]['image']						= $val['tile'];
-				$player['games'][$key]['title']						= $val['title'];
-				$player['games'][$key]['last_played']				= $val['last_played'];
-				$player['games'][$key]['earned_gamerscore']			= $val['gamerscore'];
-				$player['games'][$key]['available_gamerscore']		= $val['max_gamerscore'];
-				$player['games'][$key]['earned_achievements']		= $val['achievements'];
-				$player['games'][$key]['available_achievements']	= $val['max_achievements'];
-				$player['games'][$key]['percentage_complete']		= $val['percent_completed'];
-			}
-				
-			$player['lastplayed'] = serialize($player['games']);
-		}
+                $player['games'][$key]['tid']						= $val['tid'];
+                $player['games'][$key]['link']						= $val['marketplace'];
+                $player['games'][$key]['image']						= $val['tile'];
+                $player['games'][$key]['title']						= $val['title'];
+                $player['games'][$key]['last_played']				= $val['last_played'];
+                $player['games'][$key]['earned_gamerscore']			= $val['gamerscore'];
+                $player['games'][$key]['available_gamerscore']		= $val['max_gamerscore'];
+                $player['games'][$key]['earned_achievements']		= $val['achievements'];
+                $player['games'][$key]['available_achievements']	= $val['max_achievements'];
+                $player['games'][$key]['percentage_complete']		= $val['percent_completed'];
+            }
+
+            $player['lastplayed'] = serialize($player['games']);
+        }
         else
         {
-			$player['games'] = false;
-			$player['lastplayed'] = false;
-		}
+            $player['games'] = false;
+            $player['lastplayed'] = false;
+        }
 
-		return $player;
-	}
+        return $player;
+    }
 }
 
 /**
@@ -244,96 +244,96 @@ function sxbl_get_data($data, $member)
  */
 function sxbl_update_member($player)
 {
-	global $context, $smcFunc;
+    global $context, $smcFunc;
 
-	// Make sure we have a valid gamertag
-	$player_exists = $player['is_valid'] === 1 ? true : false;
+    // Make sure we have a valid gamertag
+    $player_exists = $player['is_valid'] === 1 ? true : false;
 
-	// OK, so he exists. Now what?
-	if ($player_exists === true)
+    // OK, so he exists. Now what?
+    if ($player_exists === true)
     {
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}xbox_leaders
-			SET
-				account_status = {int:account_status}, gender = {string:gender},
-				is_cheater = {int:is_cheater}, link = {string:link},
-				gamertag = {string:gamertag}, avatar = {string:avatar},
-				reputation = {string:reputation}, gamerscore = {string:gamerscore},
-				location = {string:location}, motto = {string:motto},
-				name = {string:name}, bio = {string:bio},
-				updated = {int:updated}
-			WHERE id_member = {int:member}',
-			array(
-				'member' => $player['id'], 'account_status' => $player['account_status'],
-				'gender' => $player['gender'], 'is_cheater' => $player['is_cheater'],
-				'link' => $player['link'], 'gamertag' => $player['gamertag'],
-				'avatar' => $player['avatar'], 'reputation' => $player['reputation'],
-				'gamerscore' => $player['gamerscore'], 'location' => $player['location'],
-				'motto' => $player['motto'], 'name' => $player['name'],
-				'bio' => $player['bio'], 'updated' => time()
-			)
-		);
+        $smcFunc['db_query']('', '
+            UPDATE {db_prefix}xbox_leaders
+            SET
+                account_status = {int:account_status}, gender = {string:gender},
+                is_cheater = {int:is_cheater}, link = {string:link},
+                gamertag = {string:gamertag}, avatar = {string:avatar},
+                reputation = {string:reputation}, gamerscore = {string:gamerscore},
+                location = {string:location}, motto = {string:motto},
+                name = {string:name}, bio = {string:bio},
+                updated = {int:updated}
+            WHERE id_member = {int:member}',
+            array(
+                'member' => $player['id'], 'account_status' => $player['account_status'],
+                'gender' => $player['gender'], 'is_cheater' => $player['is_cheater'],
+                'link' => $player['link'], 'gamertag' => $player['gamertag'],
+                'avatar' => $player['avatar'], 'reputation' => $player['reputation'],
+                'gamerscore' => $player['gamerscore'], 'location' => $player['location'],
+                'motto' => $player['motto'], 'name' => $player['name'],
+                'bio' => $player['bio'], 'updated' => time()
+            )
+        );
 
-		// If there are games to insert, do it
-		if ($player['games'] && $player['lastplayed'])
+        // If there are games to insert, do it
+        if ($player['games'] && $player['lastplayed'])
         {
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}xbox_leaders
-				SET last_played = {string:lastplayed}
-				WHERE id_member = {int:member}',
-				array(
-					'lastplayed'	=> $player['lastplayed'],
-					'member'		=> $player['id'],
-				)
-			);
+            $smcFunc['db_query']('', '
+                UPDATE {db_prefix}xbox_leaders
+                SET last_played = {string:lastplayed}
+                WHERE id_member = {int:member}',
+                array(
+                    'lastplayed'	=> $player['lastplayed'],
+                    'member'		=> $player['id'],
+                )
+            );
 
-			// Remove the games before we update it
-			@$smcFunc['db_query']('', '
-				DELETE FROM {db_prefix}xbox_games
-				WHERE id_member = {int:id_member}',
-				array(
-					'id_member' => $player['id'],
-				)
-			);
+            // Remove the games before we update it
+            @$smcFunc['db_query']('', '
+                DELETE FROM {db_prefix}xbox_games
+                WHERE id_member = {int:id_member}',
+                array(
+                    'id_member' => $player['id'],
+                )
+            );
 
-			// Update the games list too!
-			foreach ($player['games'] as $key => $game)
+            // Update the games list too!
+            foreach ($player['games'] as $key => $game)
             {
-				$game['title'] = sxbl_clean_string($game['title']);
+                $game['title'] = sxbl_clean_string($game['title']);
 
-				$smcFunc['db_insert']('ignore',
-					'{db_prefix}xbox_games',
-					array(
-						'id_member' => 'int', 'position' => 'int',
-						'title' => 'string', 'link' => 'string',
-						'image' => 'string', 'updated' => 'int'
-					),
-					array(
-						$player['id'], $key,
-						$game['title'], $game['link'],
-						$game['image'], time()
-					),
-					array()
-				);
+                $smcFunc['db_insert']('ignore',
+                    '{db_prefix}xbox_games',
+                    array(
+                        'id_member' => 'int', 'position' => 'int',
+                        'title' => 'string', 'link' => 'string',
+                        'image' => 'string', 'updated' => 'int'
+                    ),
+                    array(
+                        $player['id'], $key,
+                        $game['title'], $game['link'],
+                        $game['image'], time()
+                    ),
+                    array()
+                );
 
-				// Might as well update the archive
-				$smcFunc['db_insert']('ignore',
-					'{db_prefix}xbox_games_list',
-					array(
-						'tid' => 'string', 'title' => 'string',
-						'image' => 'string',
-					),
-					array(
-						$game['tid'], $game['title'],
-						$game['image'],
-					),
-					array('tid')
-				);
-			}
-		}
-	}
+                // Might as well update the archive
+                $smcFunc['db_insert']('ignore',
+                    '{db_prefix}xbox_games_list',
+                    array(
+                        'tid' => 'string', 'title' => 'string',
+                        'image' => 'string',
+                    ),
+                    array(
+                        $game['tid'], $game['title'],
+                        $game['image'],
+                    ),
+                    array('tid')
+                );
+            }
+        }
+    }
 
-	return true;
+    return true;
 }
 
 /**
@@ -341,44 +341,44 @@ function sxbl_update_member($player)
  */
 function sxbl_delete_member($member)
 {
-	global $smcFunc;
+    global $smcFunc;
 
-	if (is_numeric($member))
+    if (is_numeric($member))
     {
-		// Remove them from the leaders table
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}xbox_leaders
-			WHERE id_member = {int:member}',
-			array(
-				'member' => $member,
-			)
-		);
+        // Remove them from the leaders table
+        $smcFunc['db_query']('', '
+            DELETE FROM {db_prefix}xbox_leaders
+            WHERE id_member = {int:member}',
+            array(
+                'member' => $member,
+            )
+        );
 
-		// Also remove them from the games table
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}xbox_games
-			WHERE id_member = {int:member}',
-			array(
-				'member' => $member,
-			)
-		);
+        // Also remove them from the games table
+        $smcFunc['db_query']('', '
+            DELETE FROM {db_prefix}xbox_games
+            WHERE id_member = {int:member}',
+            array(
+                'member' => $member,
+            )
+        );
 
-		// Might as well remove from the members table too
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}members
-			SET gamertag = \'\'
-			WHERE id_member = {int:member}',
-			array(
-				'member' => $member,
-			)
-		);
-	}
-	else
+        // Might as well remove from the members table too
+        $smcFunc['db_query']('', '
+            UPDATE {db_prefix}members
+            SET gamertag = \'\'
+            WHERE id_member = {int:member}',
+            array(
+                'member' => $member,
+            )
+        );
+    }
+    else
     {
-		return false;
+        return false;
     }
 
-	return true;
+    return true;
 }
 
 /**
@@ -386,62 +386,62 @@ function sxbl_delete_member($member)
  */
 function sxbl_load_gamer_data($mid)
 {
-	global $smcFunc, $modSettings, $settings, $txt;
+    global $smcFunc, $modSettings, $settings, $txt;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT xbl.*, xbg.*
-		FROM {db_prefix}xbox_leaders AS xbl
-			LEFT JOIN {db_prefix}xbox_games AS xbg ON (xbg.id_member = xbl.id_member)
-		WHERE xbl.id_member = {int:id_member}
-		ORDER BY xbg.last_played DESC',
-		array(
-			'id_member' => $mid
-		)
-	);
-	$gamer_data = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+    $request = $smcFunc['db_query']('', '
+        SELECT xbl.*, xbg.*
+        FROM {db_prefix}xbox_leaders AS xbl
+            LEFT JOIN {db_prefix}xbox_games AS xbg ON (xbg.id_member = xbl.id_member)
+        WHERE xbl.id_member = {int:id_member}
+        ORDER BY xbg.last_played DESC',
+        array(
+            'id_member' => $mid
+        )
+    );
+    $gamer_data = array();
+    while ($row = $smcFunc['db_fetch_assoc']($request))
     {
-		$gamer_data[] = array(
-			'id' => $row['id_member'],
-			'gamertag' => array(
-				'raw' => $row['gamertag'],
-				'href' => '<a href="http://live.xbox.com/member/' . sxbl_convert_gamertag($row['gamertag']) . '">' . $row['gamertag'] . '</a>',
-			),
-			'gamerscore' => $row['gamerscore'],
-			'reputation' => array(
-				'raw' => $row['reputation'],
-				'img' => '<img src="' . $settings['images_url'] . '/xbl/' . $row['reputation'] . '.png" alt="' . $row['reputation'] . '" title="' . $row['reputation'] . '" />',
-			),
-			'account_status' => $row['account_status'],
-			'zone' => 'N/A',
-			'avatar' => array(
-				'raw' => $row['avatar'],
-				'img' => '<img src="' . $row['avatar'] . '" width="32px" height="32px" alt="" />',
-			),
-			'location' => $row['location'],
-			'motto' => $row['motto'],
-			'name' => $row['name'],
-			'bio' => $row['bio'],
-		);
+        $gamer_data[] = array(
+            'id' => $row['id_member'],
+            'gamertag' => array(
+                'raw' => $row['gamertag'],
+                'href' => '<a href="http://live.xbox.com/member/' . sxbl_convert_gamertag($row['gamertag']) . '">' . $row['gamertag'] . '</a>',
+            ),
+            'gamerscore' => $row['gamerscore'],
+            'reputation' => array(
+                'raw' => $row['reputation'],
+                'img' => '<img src="' . $settings['images_url'] . '/xbl/' . $row['reputation'] . '.png" alt="' . $row['reputation'] . '" title="' . $row['reputation'] . '" />',
+            ),
+            'account_status' => $row['account_status'],
+            'zone' => 'N/A',
+            'avatar' => array(
+                'raw' => $row['avatar'],
+                'img' => '<img src="' . $row['avatar'] . '" width="32px" height="32px" alt="" />',
+            ),
+            'location' => $row['location'],
+            'motto' => $row['motto'],
+            'name' => $row['name'],
+            'bio' => $row['bio'],
+        );
 
-		$gamer_data['games'][$row['tid']] = array(
-			'tid' => $row['tid'],
-			'title' => $row['title'],
-			'tile' => $row['image'],
-			'egscore' => $row['earned_gamerscore'],
-			'agscore' => $row['available_gamerscore'],
-			'echeevo' => $row['earned_achievements'],
-			'acheevo' => $row['available_achievements'],
-			'per_com' => $row['percentage_complete'],
-			'last_played' => array(
-				'raw' => $row['last_played'],
-				'date' => date('F j, Y', $row['last_played']),
-			),
-		);
-	}
-	$smcFunc['db_free_result']($request);
+        $gamer_data['games'][$row['tid']] = array(
+            'tid' => $row['tid'],
+            'title' => $row['title'],
+            'tile' => $row['image'],
+            'egscore' => $row['earned_gamerscore'],
+            'agscore' => $row['available_gamerscore'],
+            'echeevo' => $row['earned_achievements'],
+            'acheevo' => $row['available_achievements'],
+            'per_com' => $row['percentage_complete'],
+            'last_played' => array(
+                'raw' => $row['last_played'],
+                'date' => date('F j, Y', $row['last_played']),
+            ),
+        );
+    }
+    $smcFunc['db_free_result']($request);
 
-	return $gamer_data;
+    return $gamer_data;
 }
 
 /**
@@ -449,11 +449,11 @@ function sxbl_load_gamer_data($mid)
  */
 function sxbl_get_tid($string)
 {
-	$tid = parse_url($string);
-	$tid = explode('&', html_entity_decode($tid['query']));
-	$tid = explode('=', $tid['0']);
-	
-	return $tid['1'];
+    $tid = parse_url($string);
+    $tid = explode('&', html_entity_decode($tid['query']));
+    $tid = explode('=', $tid['0']);
+
+    return $tid['1'];
 }
 
 /**
@@ -461,49 +461,49 @@ function sxbl_get_tid($string)
  */
 function sxbl_stats_basic()
 {
-	global $smcFunc, $modSettings;
+    global $smcFunc, $modSettings;
 
-	// Overall
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(mem.gamertag) AS usercount,
-			SUM(xbl.gamerscore) AS gamerscore,
-			SUM(xbl.reputation) AS reputation,
-			SUM(xbl.account_status) AS gold
-		FROM {db_prefix}members AS mem
-			LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (mem.id_member = xbl.id_member)
-		WHERE mem.gamertag != \'\'
-			AND mem.posts >= {int:required_posts}
-			AND mem.last_login >= {int:user_timeout}
-			AND xbl.gamerscore >= {int:show_unranked}',
-		array(
-			'required_posts' => !empty($modSettings['xbl_required_posts']) ? $modSettings['xbl_required_posts'] : 0,
-			'user_timeout' => time() - ($modSettings['xbl_user_timeout'] * 86400),
-			'show_unranked' => !empty($modSettings['xbl_show_unranked']) ? 0 : 1,
-		)
-	);
-	$count = array();
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+    // Overall
+    $request = $smcFunc['db_query']('', '
+        SELECT COUNT(mem.gamertag) AS usercount,
+            SUM(xbl.gamerscore) AS gamerscore,
+            SUM(xbl.reputation) AS reputation,
+            SUM(xbl.account_status) AS gold
+        FROM {db_prefix}members AS mem
+            LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (mem.id_member = xbl.id_member)
+        WHERE mem.gamertag != \'\'
+            AND mem.posts >= {int:required_posts}
+            AND mem.last_login >= {int:user_timeout}
+            AND xbl.gamerscore >= {int:show_unranked}',
+        array(
+            'required_posts' => !empty($modSettings['xbl_required_posts']) ? $modSettings['xbl_required_posts'] : 0,
+            'user_timeout' => time() - ($modSettings['xbl_user_timeout'] * 86400),
+            'show_unranked' => !empty($modSettings['xbl_show_unranked']) ? 0 : 1,
+        )
+    );
+    $count = array();
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
 
-	$count['members'] 			= comma_format($row['usercount']);
-	$count['score'] 			= comma_format($row['gamerscore']);
-	$count['reputation'] 		= $row['reputation'] != 0 ? ceil($row['reputation'] / $row['usercount']) : 0;
-	$count['silver'] 			= comma_format($row['usercount'] - $row['gold']);
-	$count['gold'] 				= comma_format($row['gold']);
+    $count['members'] 			= comma_format($row['usercount']);
+    $count['score'] 			= comma_format($row['gamerscore']);
+    $count['reputation'] 		= $row['reputation'] != 0 ? ceil($row['reputation'] / $row['usercount']) : 0;
+    $count['silver'] 			= comma_format($row['usercount'] - $row['gold']);
+    $count['gold'] 				= comma_format($row['gold']);
 
-	// Games
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(DISTINCT title) AS gamescount
-		FROM {db_prefix}xbox_games AS xbg
-			LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (xbg.id_member = xbl.id_member)',
-		array()
-	);
-	$row = $smcFunc['db_fetch_assoc']($request);
-	$smcFunc['db_free_result']($request);
+    // Games
+    $request = $smcFunc['db_query']('', '
+        SELECT COUNT(DISTINCT title) AS gamescount
+        FROM {db_prefix}xbox_games AS xbg
+            LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (xbg.id_member = xbl.id_member)',
+        array()
+    );
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
 
-	$count['gamescount'] = comma_format($row['gamescount']);
+    $count['gamescount'] = comma_format($row['gamescount']);
 
-	return $count;
+    return $count;
 }
 
 /**
@@ -515,46 +515,46 @@ function sxbl_stats_basic()
  */
 function sxbl_stats_top_avatars()
 {
-	global $smcFunc, $modSettings;
+    global $smcFunc, $modSettings;
 
-	$filtered_avatars = array(
-		'http://tiles.xbox.com/tiles/8y/ov/0Wdsb2JhbC9EClZWVEoAGAFdL3RpbGUvMC8yMDAwMAAAAAAAAAD+ACrT.jpg',
-		'/xweb/lib/images/QuestionMark64x64.jpg',
-		'http://image.xboxlive.com//global/t.FFFE07D1/tile/0/20000'
-	);
+    $filtered_avatars = array(
+        'http://tiles.xbox.com/tiles/8y/ov/0Wdsb2JhbC9EClZWVEoAGAFdL3RpbGUvMC8yMDAwMAAAAAAAAAD+ACrT.jpg',
+        '/xweb/lib/images/QuestionMark64x64.jpg',
+        'http://image.xboxlive.com//global/t.FFFE07D1/tile/0/20000'
+    );
 
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			mem.id_member, mem.real_name, mem.posts, mem.last_login,
-			xbl.avatar, xbl.gamerscore, COUNT(*) AS count
-		FROM {db_prefix}members AS mem
-			LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (mem.id_member = xbl.id_member)
-		WHERE mem.gamertag != \'\'
-			AND mem.posts >= {int:required_posts}
-			AND mem.last_login >= {int:user_timeout}
-			AND xbl.gamerscore >= {int:show_unranked}
-			AND xbl.avatar NOT IN ({string:exclude})
-		GROUP BY xbl.avatar
-		ORDER BY
-			count DESC,
-			xbl.gamerscore ASC
-		LIMIT {int:limit}',
-		array(
-			'required_posts' => !empty($modSettings['xbl_required_posts']) ? $modSettings['xbl_required_posts'] : 0,
-			'user_timeout' => time() - ($modSettings['xbl_user_timeout'] * 86400),
-			'show_unranked' => !empty($modSettings['xbl_show_unranked']) ? 0 : 1,
-			'exclude' => implode('\', \'', array_values($filtered_avatars)),
-			'limit' => !empty($modSettings['xbl_stats_limit']) ? $modSettings['xbl_stats_limit'] : 5,
-		)
-	);
-	$avatars = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+    $request = $smcFunc['db_query']('', '
+        SELECT
+            mem.id_member, mem.real_name, mem.posts, mem.last_login,
+            xbl.avatar, xbl.gamerscore, COUNT(*) AS count
+        FROM {db_prefix}members AS mem
+            LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (mem.id_member = xbl.id_member)
+        WHERE mem.gamertag != \'\'
+            AND mem.posts >= {int:required_posts}
+            AND mem.last_login >= {int:user_timeout}
+            AND xbl.gamerscore >= {int:show_unranked}
+            AND xbl.avatar NOT IN ({string:exclude})
+        GROUP BY xbl.avatar
+        ORDER BY
+            count DESC,
+            xbl.gamerscore ASC
+        LIMIT {int:limit}',
+        array(
+            'required_posts' => !empty($modSettings['xbl_required_posts']) ? $modSettings['xbl_required_posts'] : 0,
+            'user_timeout' => time() - ($modSettings['xbl_user_timeout'] * 86400),
+            'show_unranked' => !empty($modSettings['xbl_show_unranked']) ? 0 : 1,
+            'exclude' => implode('\', \'', array_values($filtered_avatars)),
+            'limit' => !empty($modSettings['xbl_stats_limit']) ? $modSettings['xbl_stats_limit'] : 5,
+        )
+    );
+    $avatars = array();
+    while ($row = $smcFunc['db_fetch_assoc']($request))
     {
-		$avatars[] = $row;
+        $avatars[] = $row;
     }
-	$smcFunc['db_free_result']($request);
+    $smcFunc['db_free_result']($request);
 
-	return $avatars;
+    return $avatars;
 }
 
 /**
@@ -566,38 +566,38 @@ function sxbl_stats_top_avatars()
  */
 function sxbl_stats_top_players()
 {
-	global $smcFunc, $modSettings;
+    global $smcFunc, $modSettings;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			mem.id_member, mem.real_name, mem.posts, mem.last_login,
-			xbl.gamertag, xbl.gamerscore, COUNT(*) AS count
-		FROM {db_prefix}members AS mem
-			LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (mem.id_member = xbl.id_member)
-		WHERE mem.gamertag != \'\'
-			AND mem.posts >= {int:required_posts}
-			AND mem.last_login >= {int:user_timeout}
-			AND xbl.gamerscore >= {int:show_unranked}
-		GROUP BY mem.id_member
-		ORDER BY
-			xbl.gamerscore DESC,
-			xbl.gamertag ASC
-		LIMIT {int:limit}',
-		array(
-			'required_posts' => !empty($modSettings['xbl_required_posts']) ? $modSettings['xbl_required_posts'] : 0,
-			'user_timeout' => time() - ($modSettings['xbl_user_timeout'] * 86400),
-			'show_unranked' => !empty($modSettings['xbl_show_unranked']) ? 0 : 1,
-			'limit' => !empty($modSettings['xbl_stats_limit']) ? $modSettings['xbl_stats_limit'] : 5,
-		)
-	);
-	$players = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+    $request = $smcFunc['db_query']('', '
+        SELECT
+            mem.id_member, mem.real_name, mem.posts, mem.last_login,
+            xbl.gamertag, xbl.gamerscore, COUNT(*) AS count
+        FROM {db_prefix}members AS mem
+            LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (mem.id_member = xbl.id_member)
+        WHERE mem.gamertag != \'\'
+            AND mem.posts >= {int:required_posts}
+            AND mem.last_login >= {int:user_timeout}
+            AND xbl.gamerscore >= {int:show_unranked}
+        GROUP BY mem.id_member
+        ORDER BY
+            xbl.gamerscore DESC,
+            xbl.gamertag ASC
+        LIMIT {int:limit}',
+        array(
+            'required_posts' => !empty($modSettings['xbl_required_posts']) ? $modSettings['xbl_required_posts'] : 0,
+            'user_timeout' => time() - ($modSettings['xbl_user_timeout'] * 86400),
+            'show_unranked' => !empty($modSettings['xbl_show_unranked']) ? 0 : 1,
+            'limit' => !empty($modSettings['xbl_stats_limit']) ? $modSettings['xbl_stats_limit'] : 5,
+        )
+    );
+    $players = array();
+    while ($row = $smcFunc['db_fetch_assoc']($request))
     {
-		$players[] = $row;
+        $players[] = $row;
     }
-	$smcFunc['db_free_result']($request);
+    $smcFunc['db_free_result']($request);
 
-	return $players;
+    return $players;
 }
 
 /**
@@ -609,38 +609,38 @@ function sxbl_stats_top_players()
  */
 function sxbl_stats_top_games()
 {
-	global $smcFunc, $modSettings;
+    global $smcFunc, $modSettings;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT xbg.title, xbg.link, xbg.image,
-			COUNT(*) AS count
-		FROM {db_prefix}xbox_games AS xbg
-			LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (xbg.id_member = xbl.id_member)
-		WHERE xbl.gamerscore >= {int:show_unranked}
-		GROUP BY title
-		ORDER BY 
-			count DESC,
-			position ASC,
-			title ASC
-		LIMIT {int:limit}',
-		array(
-			'show_unranked' => !empty($modSettings['xbl_show_unranked']) ? 0 : 1,
-			'limit' => !empty($modSettings['xbl_stats_limit']) ? $modSettings['xbl_stats_limit'] : 5,
-		)
-	);
-	$games = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
-	{
-		$games[] = array(
-			'link' => $row['link'],
-			'title' => $row['title'],
-			'image' => $row['image'],
-			'count' => $row['count'],
-		);
-	}
-	$smcFunc['db_free_result']($request);
+    $request = $smcFunc['db_query']('', '
+        SELECT xbg.title, xbg.link, xbg.image,
+            COUNT(*) AS count
+        FROM {db_prefix}xbox_games AS xbg
+            LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (xbg.id_member = xbl.id_member)
+        WHERE xbl.gamerscore >= {int:show_unranked}
+        GROUP BY title
+        ORDER BY 
+            count DESC,
+            position ASC,
+            title ASC
+        LIMIT {int:limit}',
+        array(
+            'show_unranked' => !empty($modSettings['xbl_show_unranked']) ? 0 : 1,
+            'limit' => !empty($modSettings['xbl_stats_limit']) ? $modSettings['xbl_stats_limit'] : 5,
+        )
+    );
+    $games = array();
+    while ($row = $smcFunc['db_fetch_assoc']($request))
+    {
+        $games[] = array(
+            'link' => $row['link'],
+            'title' => $row['title'],
+            'image' => $row['image'],
+            'count' => $row['count'],
+        );
+    }
+    $smcFunc['db_free_result']($request);
 
-	return $games;
+    return $games;
 }
 
 /**
@@ -655,33 +655,33 @@ function sxbl_stats_top_games()
  */
 function sxbl_list_get_members($start, $items_per_page, $sort)
 {
-	global $smcFunc, $modSettings;
+    global $smcFunc, $modSettings;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT
-			xbl.id_member, mem.id_member, mem.real_name, mem.posts,
-			mem.last_login, xbl.account_status, xbl.gamertag, xbl.avatar,
-			xbl.reputation, xbl.gamerscore, xbl.last_played, xbl.updated
-		FROM {db_prefix}xbox_leaders AS xbl
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = xbl.id_member)
-		WHERE mem.gamertag != \'\'
-		ORDER BY {raw:sort}
-		LIMIT {int:start}, {int:per_page}',
-		array(
-			'sort' => $sort,
-			'start' => $start,
-			'per_page' => $items_per_page,
-		)
-	);
+    $request = $smcFunc['db_query']('', '
+        SELECT
+            xbl.id_member, mem.id_member, mem.real_name, mem.posts,
+            mem.last_login, xbl.account_status, xbl.gamertag, xbl.avatar,
+            xbl.reputation, xbl.gamerscore, xbl.last_played, xbl.updated
+        FROM {db_prefix}xbox_leaders AS xbl
+            LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = xbl.id_member)
+        WHERE mem.gamertag != \'\'
+        ORDER BY {raw:sort}
+        LIMIT {int:start}, {int:per_page}',
+        array(
+            'sort' => $sort,
+            'start' => $start,
+            'per_page' => $items_per_page,
+        )
+    );
 
-	$members = array();
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+    $members = array();
+    while ($row = $smcFunc['db_fetch_assoc']($request))
     {
-		$members[] = $row;
+        $members[] = $row;
     }
-	$smcFunc['db_free_result']($request);
+    $smcFunc['db_free_result']($request);
 
-	return $members;
+    return $members;
 }
 
 /**
@@ -693,20 +693,20 @@ function sxbl_list_get_members($start, $items_per_page, $sort)
  */
 function sxbl_list_get_num_members()
 {
-	global $smcFunc;
+    global $smcFunc;
 
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(*)
-		FROM {db_prefix}xbox_leaders AS xbl
-			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = xbl.id_member)
-		WHERE mem.gamertag != \'\'',
-		array(
-		)
-	);
-	list ($num_members) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
+    $request = $smcFunc['db_query']('', '
+        SELECT COUNT(*)
+        FROM {db_prefix}xbox_leaders AS xbl
+            LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = xbl.id_member)
+        WHERE mem.gamertag != \'\'',
+        array(
+        )
+    );
+    list ($num_members) = $smcFunc['db_fetch_row']($request);
+    $smcFunc['db_free_result']($request);
 
-	return $num_members;
+    return $num_members;
 }
 
 /**
@@ -720,51 +720,51 @@ function sxbl_list_get_num_members()
  */
 function scheduled_update_gamertags()
 {
-	global $sourcedir, $smcFunc, $modSettings;
+    global $sourcedir, $smcFunc, $modSettings;
 
-	require_once($sourcedir . '/Subs-Package.php');
+    require_once($sourcedir . '/Subs-Package.php');
 
-	$time = time();
+    $time = time();
 
-	$query = '
-		SELECT mem.id_member, mem.posts, mem.last_login, mem.gamertag, xbl.*
-		FROM {db_prefix}members AS mem
-			LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (xbl.id_member = mem.id_member)
-		WHERE mem.gamertag != \'\'
-			AND mem.posts >= {int:required_posts}
-			AND mem.last_login >= {int:user_timeout}
-			AND (xbl.updated IS NULL OR DATE_FORMAT(FROM_UNIXTIME(xbl.updated), \'%Y-%m-%d\') != \'' . date('Y-m-d', $time) . '\')
-		ORDER BY
-			xbl.updated ASC,
-			mem.id_member ASC
-		';
+    $query = '
+        SELECT mem.id_member, mem.posts, mem.last_login, mem.gamertag, xbl.*
+        FROM {db_prefix}members AS mem
+            LEFT JOIN {db_prefix}xbox_leaders AS xbl ON (xbl.id_member = mem.id_member)
+        WHERE mem.gamertag != \'\'
+            AND mem.posts >= {int:required_posts}
+            AND mem.last_login >= {int:user_timeout}
+            AND (xbl.updated IS NULL OR DATE_FORMAT(FROM_UNIXTIME(xbl.updated), \'%Y-%m-%d\') != \'' . date('Y-m-d', $time) . '\')
+        ORDER BY
+            xbl.updated ASC,
+            mem.id_member ASC
+        ';
 
-	$params = array(
-		'required_posts' => !empty($modSettings['xbl_required_posts']) ? $modSettings['xbl_required_posts'] : 0,
-		'user_timeout' => $time - ($modSettings['xbl_user_timeout'] * 86400),
-	);
+    $params = array(
+        'required_posts' => !empty($modSettings['xbl_required_posts']) ? $modSettings['xbl_required_posts'] : 0,
+        'user_timeout' => $time - ($modSettings['xbl_user_timeout'] * 86400),
+    );
 
-	$full_result = $smcFunc['db_query']('', $query, $params);
-	$query_limit = ceil($smcFunc['db_num_rows']($full_result) / ceil((strtotime(date('Y-m-d', strtotime('+1 day'))) - $time) / 60)) + 5;
-	$smcFunc['db_free_result']($full_result);
+    $full_result = $smcFunc['db_query']('', $query, $params);
+    $query_limit = ceil($smcFunc['db_num_rows']($full_result) / ceil((strtotime(date('Y-m-d', strtotime('+1 day'))) - $time) / 60)) + 5;
+    $smcFunc['db_free_result']($full_result);
 
-	// Now make the final queries needed
-	$request = $smcFunc['db_query']('', $query . 'LIMIT 0, ' . $query_limit, $params);
+    // Now make the final queries needed
+    $request = $smcFunc['db_query']('', $query . 'LIMIT 0, ' . $query_limit, $params);
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+    while ($row = $smcFunc['db_fetch_assoc']($request))
     {
-		$api = 'https://www.xboxleaders.com/api/all.json?gamertag=' . rawurlencode(strtolower($row['gamertag']));
-		$data = json_decode(http($api, true), true);
-		$card = sxbl_get_data($data, $row['id_member']);
+        $api = 'https://www.xboxleaders.com/api/all.json?gamertag=' . rawurlencode(strtolower($row['gamertag']));
+        $data = json_decode(http($api, true), true);
+        $card = sxbl_get_data($data, $row['id_member']);
 
-		if ($card !== false)
+        if ($card !== false)
         {
-			sxbl_update_member($card);
-		}
-	}
-	$smcFunc['db_free_result']($request);
+            sxbl_update_member($card);
+        }
+    }
+    $smcFunc['db_free_result']($request);
 
-	return true;
+    return true;
 }
 
 ?>

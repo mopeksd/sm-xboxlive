@@ -1,74 +1,74 @@
 <?xml version="1.0"?>
 <!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
-	<id>JBlaze:SimpleXBL</id>
-	<version>3.0.0</version>
+    <id>JBlaze:SimpleXBL</id>
+    <version>3.0.0</version>
 
-	<file name="$sourcedir/Load.php">
-		<operation>
-			<search position="replace"><![CDATA[			mem.birthdate, mem.member_ip, mem.member_ip2, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login,]]></search>
-			<add><![CDATA[			mem.birthdate, mem.member_ip, mem.member_ip2, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.gamertag,]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[			mem.openid_uri, mem.birthdate, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.karma_good,]]></search>
-			<add><![CDATA[			mem.openid_uri, mem.birthdate, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.karma_good, mem.gamertag,]]></add>
-		</operation>
-	</file>
+    <file name="$sourcedir/Load.php">
+        <operation>
+            <search position="replace"><![CDATA[			mem.birthdate, mem.member_ip, mem.member_ip2, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login,]]></search>
+            <add><![CDATA[			mem.birthdate, mem.member_ip, mem.member_ip2, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.gamertag,]]></add>
+        </operation>
+        <operation>
+            <search position="replace"><![CDATA[			mem.openid_uri, mem.birthdate, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.karma_good,]]></search>
+            <add><![CDATA[			mem.openid_uri, mem.birthdate, mem.icq, mem.aim, mem.yim, mem.msn, mem.posts, mem.last_login, mem.karma_good, mem.gamertag,]]></add>
+        </operation>
+    </file>
 
-	<file name="$sourcedir/ManagePermissions.php">
-		<operation>
-			<search position="before"><![CDATA[				'administrate',]]></search>
-			<add><![CDATA[
-				'simplexbl',]]></add>
-		</operation>
-		<operation>
-			<search position="before"><![CDATA[			'profile_remote_avatar' => array(false, 'profile', 'use_avatar'),]]></search>
-			<add><![CDATA[
-			'xbl_admin' => array(false, 'simplexbl', 'simplexbl'),
-			'xbl_access_lb' => array(false, 'simplexbl', 'simplexbl'),
-			'xbl_add_gamertag' => array(false, 'simplexbl', 'simplexbl'),]]></add>
-		</operation>
-	</file>
+    <file name="$sourcedir/ManagePermissions.php">
+        <operation>
+            <search position="before"><![CDATA[				'administrate',]]></search>
+            <add><![CDATA[
+                'simplexbl',]]></add>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[			'profile_remote_avatar' => array(false, 'profile', 'use_avatar'),]]></search>
+            <add><![CDATA[
+            'xbl_admin' => array(false, 'simplexbl', 'simplexbl'),
+            'xbl_access_lb' => array(false, 'simplexbl', 'simplexbl'),
+            'xbl_add_gamertag' => array(false, 'simplexbl', 'simplexbl'),]]></add>
+        </operation>
+    </file>
 
-	<file name="$sourcedir/Profile-Modify.php">
-		<operation>
-			<search position="after"><![CDATA[		'gender' => array(]]></search>
-			<add><![CDATA[		'gamertag' => array(
-			'type' => 'text',
-			'value' => !empty($cur_profile['gamertag']) ? $cur_profile['gamertag'] : '',
-			'label' => $txt['xbl_profile_label'],
-			'subtext' => $txt['xbl_profile_subtext'],
-			'size' => 24,
-			'permission' => 'xbl_add_gamertag',
-		),
+    <file name="$sourcedir/Profile-Modify.php">
+        <operation>
+            <search position="after"><![CDATA[		'gender' => array(]]></search>
+            <add><![CDATA[		'gamertag' => array(
+            'type' => 'text',
+            'value' => !empty($cur_profile['gamertag']) ? $cur_profile['gamertag'] : '',
+            'label' => $txt['xbl_profile_label'],
+            'subtext' => $txt['xbl_profile_subtext'],
+            'size' => 24,
+            'permission' => 'xbl_add_gamertag',
+        ),
 ]]></add>
-		</operation>
-		<operation>
-			<search position="after"><![CDATA[		// Are we doing a cast?
-		$field['cast_type'] = empty($field['cast_type']) ? $field['type'] : $field['cast_type'];]]></search>
-			<add><![CDATA[		// Stick this in here
-		if ($key == 'gamertag' && !empty($_POST['gamertag']))
-		{
-			$smcFunc['db_insert']('replace',
-				'{db_prefix}xbox_leaders',
-				array('id_member' => 'int', 'gamertag' => 'string'),
-				array($context['id_member'], $_POST['gamertag']),
-				array('id_member')
-			);
-		}
-		elseif ($key == 'gamertag' && empty($_POST['gamertag']))
-		{
-			require_once($sourcedir . '/SimpleXBL.php');
-			sxbl_delete_member($context['id_member']);
-		}
+        </operation>
+        <operation>
+            <search position="after"><![CDATA[		// Are we doing a cast?
+        $field['cast_type'] = empty($field['cast_type']) ? $field['type'] : $field['cast_type'];]]></search>
+            <add><![CDATA[		// Stick this in here
+        if ($key == 'gamertag' && !empty($_POST['gamertag']))
+        {
+            $smcFunc['db_insert']('replace',
+                '{db_prefix}xbox_leaders',
+                array('id_member' => 'int', 'gamertag' => 'string'),
+                array($context['id_member'], $_POST['gamertag']),
+                array('id_member')
+            );
+        }
+        elseif ($key == 'gamertag' && empty($_POST['gamertag']))
+        {
+            require_once($sourcedir . '/SimpleXBL.php');
+            sxbl_delete_member($context['id_member']);
+        }
 
 ]]></add>
-		</operation>
-		<operation>
-			<search position="before"><![CDATA[			'icq', 'aim', 'msn', 'yim', 'hr',]]></search>
-			<add><![CDATA[
-			'gamertag', 'hr',]]></add>
-		</operation>
-	</file>
+        </operation>
+        <operation>
+            <search position="before"><![CDATA[			'icq', 'aim', 'msn', 'yim', 'hr',]]></search>
+            <add><![CDATA[
+            'gamertag', 'hr',]]></add>
+        </operation>
+    </file>
 
 </modification>

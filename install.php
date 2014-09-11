@@ -95,10 +95,10 @@ $smcFunc['db_create_table']('{db_prefix}xbox_games_list', $xbox_games_list_colum
  * Create the scheduled task to update all gamers
  */
 $smcFunc['db_insert']('replace',
-	'{db_prefix}scheduled_tasks',
-	array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
-	array(time() + 15, 0, 15, 'm', 0, 'update_gamertags'),
-	array('id_task')
+    '{db_prefix}scheduled_tasks',
+    array('next_time' => 'int', 'time_offset' => 'int', 'time_regularity' => 'int', 'time_unit' => 'string', 'disabled' => 'int', 'task' => 'string'),
+    array(time() + 15, 0, 15, 'm', 0, 'update_gamertags'),
+    array('id_task')
 );
 
 /**

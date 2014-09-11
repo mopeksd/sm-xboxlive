@@ -19,24 +19,24 @@ elseif(!defined('SMF'))
 
 // List settings here
 $oldSettings = array(
-	'xbl_enable',
-	'xbl_items_page',
-	'xbl_required_posts',
-	'xbl_user_timeout',
-	'xbl_show_unranked',
-	'xbl_stat_limit',
-	'xbl_menu_title',
-	'xbl_gtag_image_path',
-	'xbl_game_image_path',
-	'xbl_gtag_image_url',
-	'xbl_game_image_url',
+    'xbl_enable',
+    'xbl_items_page',
+    'xbl_required_posts',
+    'xbl_user_timeout',
+    'xbl_show_unranked',
+    'xbl_stat_limit',
+    'xbl_menu_title',
+    'xbl_gtag_image_path',
+    'xbl_game_image_path',
+    'xbl_gtag_image_url',
+    'xbl_game_image_url',
 );
 
 $hooks = array(
-	'integrate_load_theme' => 'sxblLoadTheme',
-	'integrate_admin_areas' => 'sxblAdminAreas',
-	'integrate_menu_buttons' => 'sxblMenuButtons',
-	'integrate_actions' => 'sxblActions',
+    'integrate_load_theme' => 'sxblLoadTheme',
+    'integrate_admin_areas' => 'sxblAdminAreas',
+    'integrate_menu_buttons' => 'sxblMenuButtons',
+    'integrate_actions' => 'sxblActions',
 );
 
 // Remove hooks
@@ -47,13 +47,13 @@ foreach ($hooks as $hook => $function)
 
 if (!empty($smcFunc['db_query']))
 {
-	$smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}settings
-		WHERE variable IN ({array_string:settings})',
-		array(
-			'settings' => $oldSettings,
-		)
-	);
+    $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}settings
+        WHERE variable IN ({array_string:settings})',
+        array(
+            'settings' => $oldSettings,
+        )
+    );
 }
 
 ?>
