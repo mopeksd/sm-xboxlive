@@ -301,4 +301,59 @@ function DeleteMember()
     redirectexit('action=simplexbl;deleted=true');
 }
 
+/**
+ * Pagination function for the leaderboard
+ */
+function list_getGamertags($start, $items_per_page, $sort)
+{
+    global $smcFunc, $modSettings;
+
+    $request = $smcFunc['db_query']('', '
+        SELECT
+            xbl.id_member, mem.id_member, mem.real_name, mem.posts,
+            mem.last_login, xbl.account_status, xbl.gamertag, xbl.avatar,
+            xbl.reputation, xbl.gamerscore, xbl.last_played, xbl.updated
+        FROM {db_prefix}xbox_leaders AS xbl
+            LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = xbl.id_member)
+        WHERE mem.gamertag != \'\'
+        ORDER BY {raw:sort}
+        LIMIT {int:start}, {int:per_page}',
+        array(
+            'sort' => $sort,
+            'start' => $start,
+            'per_page' => $items_per_page,
+        )
+    );
+
+    $members = array();
+    while ($row = $smcFunc['db_fetch_assoc']($request))
+    {
+        $members[] = $row;
+    }
+    $smcFunc['db_free_result']($request);
+
+    return $members;
+}
+
+/**
+ * Pagination function for the leaderboard
+ */
+function list_getNumGamertags()
+{
+    global $smcFunc;
+
+    $request = $smcFunc['db_query']('', '
+        SELECT COUNT(*)
+        FROM {db_prefix}xbox_leaders AS xbl
+            LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = xbl.id_member)
+        WHERE mem.gamertag != \'\'',
+        array(
+        )
+    );
+    list ($num_members) = $smcFunc['db_fetch_row']($request);
+    $smcFunc['db_free_result']($request);
+
+    return $num_members;
+}
+
 ?>
