@@ -2,13 +2,12 @@
 /**
  * SimpleXBL
  *
- * @package SMF
- * @author Jason Clemons <jason@xboxleaders.com>
- * @file Subs-SimpleXBL.php
- * @copyright 2014 Jason Clemons <https://github.com/jasonclemons>
- * @license MIT
- *
- * @version 3.0.0
+ * @package     SMF
+ * @author      Jason Clemons <jason@xboxleaders.com>
+ * @file        Subs-SimpleXBL.php
+ * @copyright   2014 Jason Clemons <https://github.com/jasonclemons>
+ * @license     MIT
+ * @version     3.0.0
  */
 
 if (!defined('SMF'))
@@ -112,14 +111,6 @@ function ModifySimpleXBLSettings()
     );
 
     $subActions[$_REQUEST['sa']]();
-}
-
-/**
- * Load necessary language files
- */
-function sxblLoadTheme()
-{
-    loadLanguage('SimpleXBL');
 }
 
 /**
@@ -508,10 +499,6 @@ function sxbl_stats_basic()
 
 /**
  * Returns a list of top avatars for the leaderboard
- *
- * @global array $smcFunc
- * @global array $modSettings
- * @return array $avatars
  */
 function sxbl_stats_top_avatars()
 {
@@ -559,10 +546,6 @@ function sxbl_stats_top_avatars()
 
 /**
  * Returns a list of the top players for the leaderboard
- *
- * @global array $smcFunc
- * @global array $modSettings
- * @return array $players
  */
 function sxbl_stats_top_players()
 {
@@ -602,10 +585,6 @@ function sxbl_stats_top_players()
 
 /**
  * Returns a list of the top played games for the leaderboard
- *
- * @global array $smcFunc
- * @global array $modSettings
- * @return array $games
  */
 function sxbl_stats_top_games()
 {
@@ -645,15 +624,8 @@ function sxbl_stats_top_games()
 
 /**
  * Pagination function for the leaderboard
- *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @global array $smcFunc
- * @global array $modSettings
- * @return array $members
  */
-function sxbl_list_get_members($start, $items_per_page, $sort)
+function list_getGamertags($start, $items_per_page, $sort)
 {
     global $smcFunc, $modSettings;
 
@@ -686,12 +658,8 @@ function sxbl_list_get_members($start, $items_per_page, $sort)
 
 /**
  * Pagination function for the leaderboard
- *
- * @global array $smcFunc
- * @global array $modSettings
- * @return array $num_members
  */
-function sxbl_list_get_num_members()
+function list_getNumGamertags()
 {
     global $smcFunc;
 
@@ -711,12 +679,6 @@ function sxbl_list_get_num_members()
 
 /**
  * Update the data for the entire app based on scheduled tasks
- *
- * @global string $sourcedir
- * @global array $smcFunc
- * @global array $modSettings
- * @global array $context
- * @return bool
  */
 function scheduled_update_gamertags()
 {

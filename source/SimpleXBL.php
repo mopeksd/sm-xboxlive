@@ -2,13 +2,12 @@
 /**
  * SimpleXBL
  *
- * @package SMF
- * @author Jason Clemons <jason@xboxleaders.com>
- * @file SimpleXBL.php
- * @copyright 2011 Jason Clemons <https://github.com/jasonclemons>
- * @license MIT
- *
- * @version 3.0.0
+ * @package     SMF
+ * @author      Jason Clemons <jason@xboxleaders.com>
+ * @file        SimpleXBL.php
+ * @copyright   2014 Jason Clemons <https://github.com/jasonclemons>
+ * @license     MIT
+ * @version     3.0.0
  */
 
 if (!defined('SMF'))
@@ -17,7 +16,7 @@ if (!defined('SMF'))
 }
 
 /**
- * @var string App version
+ * App version
  */
 $context['xbl_version'] = '3.0.0';
 
@@ -32,6 +31,7 @@ function SimpleXBL()
     require_once($sourcedir . '/Subs-SimpleXBL.php');
 
     loadTemplate('SimpleXBL');
+    loadLanguage('SimpleXBL')
 
     $subActions = array(
         'main' => 'Leaderboard',
@@ -126,10 +126,10 @@ function Leaderboard()
         'no_items_label' => $txt['xbl_no_data'],
         'no_items_align' => 'center',
         'get_items' => array(
-            'function' => 'sxbl_list_get_members',
+            'function' => 'list_getGamertags',
         ),
         'get_count' => array(
-            'function' => 'sxbl_list_get_num_members',
+            'function' => 'list_getNumGamertags',
         ),
         'columns' => array(
             'member' => array(
@@ -253,7 +253,7 @@ function Leaderboard()
                     'function' => create_function('$rowData', '
                         global $scripturl, $settings, $user_info, $txt, $context;
 
-                        $buttons = \'<a target="_blank" href="http://live.xbox.com/MyXbox/Profile?Gamertag=\' . $rowData[\'gamertag\'] . \'" title="\' . $txt[\'xbl_view_profile\'] . \'">
+                        $buttons = \'<a target="_blank" href="http://live.xbox.com/Profile?Gamertag=\' . $rowData[\'gamertag\'] . \'" title="\' . $txt[\'xbl_view_profile\'] . \'">
                                 <img src="\' . $settings[\'images_url\'] . \'/xbl/user.png" alt="" />
                             </a> <a target="_blank" href="http://live.xbox.com/Messages/Compose?gamertag=\' . $rowData[\'gamertag\'] . \'" title="\' . $txt[\'xbl_send_msg\'] . \'">
                                 <img src="\' . $settings[\'images_url\'] . \'/xbl/message.png" alt="" />

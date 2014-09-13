@@ -1,7 +1,12 @@
 - 3.0.0
     ! Major overhaul of code
     ! Moved all helper functions to Subs-SimpleXBL.php
-    ! Overhaul of intallers/uninstallers
+    ! Removed use of <code> in package-info.xml
+    ! Added uninstall.xml to reduce uninstallation complications
+    ! Merged add_settings.php with install.php
+    ! Merged remove_settings.php with uninstall.php
+    ! Added smf-readme.txt to make use of BBCode rather than Markdown
+    ! All database changes will be uninstalled, including settings
 
 +++++++++++++++++++++++++++++++++++
 

@@ -18,6 +18,50 @@ elseif(!defined('SMF'))
    die('<strong>Error:</strong> Cannot install - please verify you put this file in the same place as SMF\'s SSI.php.');
 }
 
+// List settings here
+$oldSettings = array(
+    'xbl_enable',
+    'xbl_items_page',
+    'xbl_required_posts',
+    'xbl_user_timeout',
+    'xbl_show_unranked',
+    'xbl_stat_limit',
+    'xbl_menu_title',
+    'xbl_gtag_image_path',
+    'xbl_game_image_path',
+    'xbl_gtag_image_url',
+    'xbl_game_image_url',
+);
+
+$hooks = array(
+    'integrate_load_theme' => 'sxblLoadTheme',
+    'integrate_admin_areas' => 'sxblAdminAreas',
+    'integrate_menu_buttons' => 'sxblMenuButtons',
+    'integrate_actions' => 'sxblActions',
+);
+
+/**
+ * Remove any integration hooks we have used
+ */
+foreach ($hooks as $hook => $function)
+{
+    remove_integration_function($hook, $function);
+}
+
+/**
+ * Remove any values we have created in the $modSettings array
+ */
+if (!empty($smcFunc['db_query']))
+{
+    $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}settings
+        WHERE variable IN ({array_string:settings})',
+        array(
+            'settings' => $oldSettings,
+        )
+    );
+}
+
 /**
  * Remove the xbox_leaders, xbox_games, and xbox_games_list tables
  */
@@ -28,12 +72,22 @@ $smcFunc['db_query']('', 'DROP TABLE IF EXISTS {db_prefix}xbox_games_list', arra
 /**
  * Remove any scheduled tasks that were created
  */
-//!!!
+$smcFunc['db_query']('', '
+    DELETE FROM {db_prefix}scheduled_tasks
+    WHERE task = {string:task}',
+    array(
+        'task' => 'update_gamertags'
+    )
+);
 
 /**
  * Remove any extra columns we may have created in other tables
  */
-//!!!
+$smcFunc['db_query']('', '
+    ALTER TABLE {db_prefix}members
+    DROP COLUMN gamertag',
+    array()
+);
 
 /**
  * Are we done? If so, exit out.

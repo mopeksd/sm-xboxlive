@@ -5,39 +5,26 @@
     <name>SimpleXBL</name>
     <version>3.0.0</version>
     <type>modification</type>
-
     <install for="2.0-2.0.99">
-        <readme type="file">README.md</readme>
-
+        <readme type="file">smf-readme.txt</readme>
         <database>install.php</database>
-        <code>add_settings.php</code>
-
         <modification format="xml" type="file">install.xml</modification>
-
         <require-file name="source/SimpleXBL.php" destination="$sourcedir" />
         <require-file name="source/Subs-SimpleXBL.php" destination="$sourcedir" />
         <require-file name="template/SimpleXBL.template.php" destination="$themedir" />
         <require-file name="language/SimpleXBL.english.php" destination="$languagedir" />
         <require-file name="language/SimpleXBL.english-utf8.php" destination="$languagedir" />
-
         <require-dir name="images/xbl" destination="$imagesdir" />
-
         <redirect url="?action=admin;area=simplexbl" />
     </install>
-
     <uninstall for="2.0-2.0.99">
         <database>uninstall.php</database>
-        <code>remove_settings.php</code>
-
-        <modification format="xml" type="file" reverse="true">install.xml</modification>
-
+        <modification format="xml" type="file">uninstall.xml</modification>
         <remove-file name="$sourcedir/SimpleXBL.php" />
         <remove-file name="$sourcedir/Subs-SimpleXBL.php" />
         <remove-file name="$themedir/SimpleXBL.template.php" />
         <remove-file name="$languagedir/SimpleXBL.english.php" />
         <remove-file name="$languagedir/SimpleXBL.english-utf8.php" />
-
         <remove-dir name="$imagesdir/xbl" />
     </uninstall>
-
 </package-info>

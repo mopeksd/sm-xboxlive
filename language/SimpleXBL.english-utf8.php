@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Version 2.0; SimpleXBL
 
 $txt['simplexbl'] = 'SimpleXBL';
@@ -49,6 +49,7 @@ $txt['xbl_show_unranked'] = 'Show unranked Gamertags?';
 $txt['xbl_show_unranked_sub'] = 'If checked, Gamertags with a Gamerscore of 0 will be included in leaderboard.';
 $txt['xbl_stat_limit'] = 'Number of top stats to show';
 $txt['xbl_stat_limit_sub'] = 'This is the number of top stats for each section to show. Default is 5.';
+$txt['xbl_menu_title'] = 'Custom Navbar Title (ex. Xbox Leaders)';
 $txt['xbl_game_image_path'] = 'Game Images Path';
 $txt['xbl_game_image_path_sub'] = 'This is the path that all game images will be stored.';
 $txt['xbl_game_image_url'] = 'Game Images Directory';
