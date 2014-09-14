@@ -84,52 +84,39 @@ function sxblActions(&$actionArray)
 }
 
 /**
- * Direct the admin to the proper page of settings for SimpleXBL
+ * Find a needle in a haystack
  */
-function ModifySimpleXBLSettings()
+function sxbl_find_string($haystack, $start, $finish)
 {
-    global $txt, $context, $sourcedir;
+    if (!empty($haystack)) {
+        $s = explode($start, $haystack);
 
-    require_once($sourcedir . '/ManageSettings.php');
+        if (!empty($s[1])) {
+            $s = explode($finish, $s[1]);
+            if (!empty($s[0])) {
+                return $s[0];
+            }
+        }
+    }
 
-    $context['page_title'] = $txt['simplexbl'];
-
-    $subActions = array(
-        'basic' => 'ModifyBasicSXBLSettings',
-    );
-
-    loadGeneralSettingParameters($subActions, 'basic');
-
-    // Load up all the tabs...
-    $context[$context['admin_menu_name']]['tab_data'] = array(
-        'title' => $txt['simplexbl'],
-        'description' => $txt['simplexbl_desc'],
-        'tabs' => array(
-            'basic' => array(
-            ),
-        ),
-    );
-
-    $subActions[$_REQUEST['sa']]();
+    return false;
 }
 
 /**
  * Makes an HTTP request using cURL or file_get_contents()
  */
-function http($url, $method = 'GET', $parameters = array())
+function sxbl_http_get($url, $parameters = array())
 {
+    global $sourcedir;
+
     // No cURL? No problem.
     if (!function_exists('curl_init'))
     {
-        if ($method !== 'POST')
-        {
-            log_error('critical', 'http() - You cannot make POST requests without cURL.');
-            return;
-        }
+        require_once($sourcedir . '/Subs-Package.php');
 
         $url = $url . '?' . http_build_query($parameters, null, '&');
-        $data = file_get_contents($url);
-        return $data;
+
+        return fetch_web_data($url);
     }
 
     $ch = curl_init();
@@ -138,16 +125,9 @@ function http($url, $method = 'GET', $parameters = array())
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-    //!!! This could be better, but it works for now...
-    switch ($method)
+    if (is_array($parameters) && !empty($parameters))
     {
-        case 'GET':
-            $url = $url . '?' . http_build_query($parameters, null, '&');
-        break;
-        case 'POST':
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $parameters);
-        break;
+        $url = $url . '?' . http_build_query($parameters, null, '&');
     }
 
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -172,62 +152,38 @@ function sxbl_clean_string($string)
  * Retrieves data from the API, then parses it into
  * a useable array
  */
-function sxbl_get_data($data, $member)
+function sxbl_get_data($member)
 {
-    global $sourcedir, $context, $modSettings, $scripturl;
+    global $context, $modSettings, $scripturl;
 
-    $player['id'] = $member;
+    $html = sxbl_http_get('http://gamercard.xbox.com/' . $member['gamertag'] . '.card');
 
-    if (!is_array($data) || $data === false)
+    $player_data = array();
+    $player_data['valid'] = (stripos($html, 'http://image.xboxlive.com//global/t.FFFE07D1/tile/0/20000') !==false) ? false : true;
+
+    if ($player_data['valid'])
     {
-        return false;
-    }
-    else
-    {
-        $player['is_valid']			= $data['status']['is_valid'] === 'yes' ? 1 : 0;
-        $player['account_status']	= $data['status']['tier'] === 'gold' ? 1 : 0;
-        $player['gender']			= $data['profile']['gender'];
-        $player['is_cheater']		= $data['status']['is_cheater'] === 'yes' ? 1 : 0;
-        $player['link']				= $data['profile']['url'];
-        $player['gamertag']			= $data['profile']['gamertag'];
-        $player['avatar']			= $data['profile']['avatar_small'];
-        $player['reputation']		= $data['profile']['reputation'];
-        $player['gamerscore']		= $data['profile']['gamerscore'];
-        $player['location']			= $data['profile']['location'];
-        $player['motto']			= $data['profile']['motto'];
-        $player['name']				= $data['profile']['name'];
-        $player['bio']				= $data['profile']['bio'];
+        $player_data['gamercard'] = sxbl_find_string($html, '<title>', '</title>');
 
-        if (!empty($data['recent_games']))
+        // Find the account status and gender
+        $temp_string = sxbl_find_string($html, '<div class="XbcGamercard', '">');
+        $player_data['account_gold'] = stripos($temp_string, 'Gold') !== false ? true : false;
+        if (stripos($temp_string, 'Female') !== false)
         {
-            $player['games'] = array();
-
-            foreach ($data['recent_games'] as $key => $val)
-            {
-                $val['last_played']									= strtotime($val['last_played']);
-
-                $player['games'][$key]['tid']						= $val['tid'];
-                $player['games'][$key]['link']						= $val['marketplace'];
-                $player['games'][$key]['image']						= $val['tile'];
-                $player['games'][$key]['title']						= $val['title'];
-                $player['games'][$key]['last_played']				= $val['last_played'];
-                $player['games'][$key]['earned_gamerscore']			= $val['gamerscore'];
-                $player['games'][$key]['available_gamerscore']		= $val['max_gamerscore'];
-                $player['games'][$key]['earned_achievements']		= $val['achievements'];
-                $player['games'][$key]['available_achievements']	= $val['max_achievements'];
-                $player['games'][$key]['percentage_complete']		= $val['percent_completed'];
-            }
-
-            $player['lastplayed'] = serialize($player['games']);
+            $player_data['gender'] = 'female';
         }
-        else
+        else if (stripos($temp_string, 'Male') !== false)
         {
-            $player['games'] = false;
-            $player['lastplayed'] = false;
+            $player_data['gender'] = 'male';
         }
+        unset($temp_string);
 
-        return $player;
+        $player_data['gamerpic'] = sxbl_find_string($html, '<img id="Gamerpic" href="', '" alt=');
+        $player_data['gamerscore'] = sxbl_find_string($html, '<div id="Gamerscore">', '</div>');
+        $player_data['location'] = sxbl_find_string($html, '<div id="Location">', '</div>');
     }
+
+    return $player_data;
 }
 
 /**
@@ -623,68 +579,12 @@ function sxbl_stats_top_games()
 }
 
 /**
- * Pagination function for the leaderboard
- */
-function list_getGamertags($start, $items_per_page, $sort)
-{
-    global $smcFunc, $modSettings;
-
-    $request = $smcFunc['db_query']('', '
-        SELECT
-            xbl.id_member, mem.id_member, mem.real_name, mem.posts,
-            mem.last_login, xbl.account_status, xbl.gamertag, xbl.avatar,
-            xbl.reputation, xbl.gamerscore, xbl.last_played, xbl.updated
-        FROM {db_prefix}xbox_leaders AS xbl
-            LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = xbl.id_member)
-        WHERE mem.gamertag != \'\'
-        ORDER BY {raw:sort}
-        LIMIT {int:start}, {int:per_page}',
-        array(
-            'sort' => $sort,
-            'start' => $start,
-            'per_page' => $items_per_page,
-        )
-    );
-
-    $members = array();
-    while ($row = $smcFunc['db_fetch_assoc']($request))
-    {
-        $members[] = $row;
-    }
-    $smcFunc['db_free_result']($request);
-
-    return $members;
-}
-
-/**
- * Pagination function for the leaderboard
- */
-function list_getNumGamertags()
-{
-    global $smcFunc;
-
-    $request = $smcFunc['db_query']('', '
-        SELECT COUNT(*)
-        FROM {db_prefix}xbox_leaders AS xbl
-            LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = xbl.id_member)
-        WHERE mem.gamertag != \'\'',
-        array(
-        )
-    );
-    list ($num_members) = $smcFunc['db_fetch_row']($request);
-    $smcFunc['db_free_result']($request);
-
-    return $num_members;
-}
-
-/**
  * Update the data for the entire app based on scheduled tasks
  */
 function scheduled_update_gamertags()
 {
-    global $sourcedir, $smcFunc, $modSettings;
+    global $smcFunc, $modSettings;
 
-    require_once($sourcedir . '/Subs-Package.php');
 
     $time = time();
 
@@ -715,13 +615,9 @@ function scheduled_update_gamertags()
 
     while ($row = $smcFunc['db_fetch_assoc']($request))
     {
-        $api = 'https://www.xboxleaders.com/api/all.json?gamertag=' . rawurlencode(strtolower($row['gamertag']));
-        $data = json_decode(http($api, true), true);
-        $card = sxbl_get_data($data, $row['id_member']);
-
-        if ($card !== false)
+        if ($data = sxbl_get_data($row['id_member']))
         {
-            sxbl_update_member($card);
+            sxbl_update_member($data);
         }
     }
     $smcFunc['db_free_result']($request);

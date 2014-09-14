@@ -302,6 +302,36 @@ function DeleteMember()
 }
 
 /**
+ * Direct the admin to the proper page of settings for SimpleXBL
+ */
+function ModifySimpleXBLSettings()
+{
+    global $txt, $context, $sourcedir;
+
+    require_once($sourcedir . '/ManageSettings.php');
+
+    $context['page_title'] = $txt['simplexbl'];
+
+    $subActions = array(
+        'basic' => 'ModifyBasicSXBLSettings',
+    );
+
+    loadGeneralSettingParameters($subActions, 'basic');
+
+    // Load up all the tabs...
+    $context[$context['admin_menu_name']]['tab_data'] = array(
+        'title' => $txt['simplexbl'],
+        'description' => $txt['simplexbl_desc'],
+        'tabs' => array(
+            'basic' => array(
+            ),
+        ),
+    );
+
+    $subActions[$_REQUEST['sa']]();
+}
+
+/**
  * Pagination function for the leaderboard
  */
 function list_getGamertags($start, $items_per_page, $sort)

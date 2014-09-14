@@ -7,6 +7,8 @@
 ! Merged remove_settings.php with uninstall.php
 ! Added smf-readme.txt to make use of BBCode rather than Markdown
 ! All database changes will be uninstalled, including settings
+! Moved ModifySimpleXBLSettings() to SimpleXBL.php
+! Removed old API, added own scraping utils
 
 +++++++++++++++++++++++++++++++++++
 
