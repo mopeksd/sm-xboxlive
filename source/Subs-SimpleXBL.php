@@ -159,11 +159,11 @@ function sxbl_get_data($member)
     $html = sxbl_http_get('http://gamercard.xbox.com/' . $member['gamertag'] . '.card');
 
     $player_data = array();
-    $player_data['valid'] = (stripos($html, 'http://image.xboxlive.com//global/t.FFFE07D1/tile/0/20000') !==false) ? false : true;
+    $player_data['valid'] = (stripos($html, 'http://image.xboxlive.com//global/t.FFFE07D1/tile/0/20000') !== false) ? false : true;
 
     if ($player_data['valid'])
     {
-        $player_data['gamercard'] = sxbl_find_string($html, '<title>', '</title>');
+        $player_data['gamertag'] = sxbl_find_string($html, '<title>', '</title>');
 
         // Find the account status and gender
         $temp_string = sxbl_find_string($html, '<div class="XbcGamercard', '">');
@@ -178,9 +178,50 @@ function sxbl_get_data($member)
         }
         unset($temp_string);
 
-        $player_data['gamerpic'] = sxbl_find_string($html, '<img id="Gamerpic" href="', '" alt=');
-        $player_data['gamerscore'] = sxbl_find_string($html, '<div id="Gamerscore">', '</div>');
-        $player_data['location'] = sxbl_find_string($html, '<div id="Location">', '</div>');
+        // Find the total reputation value
+        $player_data['reputation'] = 0;
+        preg_match_all($html, '~<div class="Star (.*?)">~si', $temp_data);
+        $values = array(
+            'Empty' => 0,
+            'Quarter' => 1,
+            'Half' => 2,
+            'ThreeQuarter' => 3,
+            'Full' => 4
+        );
+        foreach ($temp_data[1] as $k)
+        {
+            $player_data['reputation'] = $player_data['reputation'] + $values[$k];
+        }
+        unset($temp_data);
+
+        // Easy values to find
+        $player_data['gamerpic']    = sxbl_find_string($html, '<img id="Gamerpic" href="', '" alt=');
+        $player_data['gamerscore']  = sxbl_find_string($html, '<div id="Gamerscore">', '</div>');
+        $player_data['location']    = sxbl_find_string($html, '<div id="Location">', '</div>');
+        $player_data['motto']       = sxbl_find_string($html, '<div id="Name">', '</div>');
+        $player_data['name']        = sxbl_find_string($html, '<div id="Name">', '</div>');
+        $player_data['bio']         = sxbl_find_string($html, '<div id="Bio">', '</div>');
+
+        // Recent games played, up to 5
+        $player_data['recent']      = array();
+        preg_match_all($html, '~<ol id="PlayedGames.*?<li>(.*?)<\/ol>~si', $temp_data);
+
+        $i = 0;
+        foreach ($temp_data[1] as $data)
+        {
+            $player_data['recent'][$i]['tid']                   = sxbl_find_string($data, 'titleId=', '&');
+            $player_data['recent'][$i]['compare_url']           = sxbl_find_string($data, '<a href="', '"');
+            $player_data['recent'][$i]['thumbnail']             = sxbl_find_string($data, '<img src="', '" alt=');
+            $player_data['recent'][$i]['title']                 = sxbl_find_string($data, '<span class="Title">', '</span>');
+            $player_data['recent'][$i]['last_played']           = sxbl_find_string($data, '<span class="LastPlayed">', '</span>');
+            $player_data['recent'][$i]['gamerscore']            = sxbl_find_string($data, '<span class="EarnedGamerscore">', '</span>');
+            $player_data['recent'][$i]['total_gamerscore']      = sxbl_find_string($data, '<span class="AvailableGamerscore">', '</span>');
+            $player_data['recent'][$i]['achievements']          = sxbl_find_string($data, '<span class="EarnedAchievements">', '</span>');
+            $player_data['recent'][$i]['total_achievements']    = sxbl_find_string($data, '<span class="AvailableAchievements">', '</span>');
+            $player_data['recent'][$i]['percent_complete']      = sxbl_find_string($data, '<span class="PercentageComplete">', '</span>');
+        }
+
+        $player_data['recent'] = serialize($player_data['recent']);
     }
 
     return $player_data;
@@ -389,18 +430,6 @@ function sxbl_load_gamer_data($mid)
     $smcFunc['db_free_result']($request);
 
     return $gamer_data;
-}
-
-/**
- * Grabs a game's unique tid from a URL
- */
-function sxbl_get_tid($string)
-{
-    $tid = parse_url($string);
-    $tid = explode('&', html_entity_decode($tid['query']));
-    $tid = explode('=', $tid['0']);
-
-    return $tid['1'];
 }
 
 /**
