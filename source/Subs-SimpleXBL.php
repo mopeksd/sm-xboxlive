@@ -195,7 +195,7 @@ function sxbl_get_data($member)
         unset($temp_data);
 
         // Easy values to find
-        $player_data['gamerpic']    = sxbl_find_string($html, '<img id="Gamerpic" href="', '" alt=');
+        $player_data['avatar']      = sxbl_find_string($html, '<img id="Gamerpic" href="', '" alt=');
         $player_data['gamerscore']  = sxbl_find_string($html, '<div id="Gamerscore">', '</div>');
         $player_data['location']    = sxbl_find_string($html, '<div id="Location">', '</div>');
         $player_data['motto']       = sxbl_find_string($html, '<div id="Name">', '</div>');
@@ -204,14 +204,19 @@ function sxbl_get_data($member)
 
         // Recent games played, up to 5
         $player_data['recent']      = array();
-        preg_match_all($html, '~<ol id="PlayedGames.*?<li>(.*?)<\/ol>~si', $temp_data);
+        if (stripos($data, 'class="NoGames"') !== false)
+        {
+            return $player_data;
+        }
+        preg_match($html, '~<ol id="PlayedGames.*?>(.*?)<\/ol>~si', $temp_games);
+        preg_match_all($temp_games[1], '~<li.*?>(.*?)<\/li>~si', $temp_data);
 
         $i = 0;
         foreach ($temp_data[1] as $data)
         {
             $player_data['recent'][$i]['tid']                   = sxbl_find_string($data, 'titleId=', '&');
-            $player_data['recent'][$i]['compare_url']           = sxbl_find_string($data, '<a href="', '"');
-            $player_data['recent'][$i]['thumbnail']             = sxbl_find_string($data, '<img src="', '" alt=');
+            $player_data['recent'][$i]['link']                  = sxbl_find_string($data, '<a href="', '"');
+            $player_data['recent'][$i]['image']                 = sxbl_find_string($data, '<img src="', '" alt=');
             $player_data['recent'][$i]['title']                 = sxbl_find_string($data, '<span class="Title">', '</span>');
             $player_data['recent'][$i]['last_played']           = sxbl_find_string($data, '<span class="LastPlayed">', '</span>');
             $player_data['recent'][$i]['gamerscore']            = sxbl_find_string($data, '<span class="EarnedGamerscore">', '</span>');
@@ -220,6 +225,7 @@ function sxbl_get_data($member)
             $player_data['recent'][$i]['total_achievements']    = sxbl_find_string($data, '<span class="AvailableAchievements">', '</span>');
             $player_data['recent'][$i]['percent_complete']      = sxbl_find_string($data, '<span class="PercentageComplete">', '</span>');
         }
+        unset($temp_data);
 
         $player_data['recent'] = serialize($player_data['recent']);
     }
@@ -234,31 +240,31 @@ function sxbl_update_member($player)
 {
     global $context, $smcFunc;
 
-    // Make sure we have a valid gamertag
-    $player_exists = $player['is_valid'] === 1 ? true : false;
-
     // OK, so he exists. Now what?
-    if ($player_exists === true)
+    if ($player['valid'] === true)
     {
         $smcFunc['db_query']('', '
             UPDATE {db_prefix}xbox_leaders
             SET
-                account_status = {int:account_status}, gender = {string:gender},
-                is_cheater = {int:is_cheater}, link = {string:link},
-                gamertag = {string:gamertag}, avatar = {string:avatar},
-                reputation = {string:reputation}, gamerscore = {string:gamerscore},
-                location = {string:location}, motto = {string:motto},
-                name = {string:name}, bio = {string:bio},
-                updated = {int:updated}
+                account_status = {int:account_status}, gender = {string:gender}, is_cheater = {int:is_cheater}, link = {string:link},
+                gamertag = {string:gamertag}, avatar = {string:avatar}, reputation = {string:reputation}, gamerscore = {string:gamerscore},
+                location = {string:location}, motto = {string:motto}, name = {string:name}, bio = {string:bio}, updated = {int:updated}
             WHERE id_member = {int:member}',
             array(
-                'member' => $player['id'], 'account_status' => $player['account_status'],
-                'gender' => $player['gender'], 'is_cheater' => $player['is_cheater'],
-                'link' => $player['link'], 'gamertag' => $player['gamertag'],
-                'avatar' => $player['avatar'], 'reputation' => $player['reputation'],
-                'gamerscore' => $player['gamerscore'], 'location' => $player['location'],
-                'motto' => $player['motto'], 'name' => $player['name'],
-                'bio' => $player['bio'], 'updated' => time()
+                'member'            => $player['id'],
+                'account_status'    => $player['account_status'],
+                'gender'            => $player['gender'],
+                'is_cheater'        => $player['is_cheater'],
+                'link'              => $player['link'],
+                'gamertag'          => $player['gamertag'],
+                'avatar'            => $player['avatar'],
+                'reputation'        => $player['reputation'],
+                'gamerscore'        => $player['gamerscore'],
+                'location'          => $player['location'],
+                'motto'             => $player['motto'],
+                'name'              => $player['name'],
+                'bio'               => $player['bio'],
+                'updated'           => time()
             )
         );
 
@@ -292,14 +298,20 @@ function sxbl_update_member($player)
                 $smcFunc['db_insert']('ignore',
                     '{db_prefix}xbox_games',
                     array(
-                        'id_member' => 'int', 'position' => 'int',
-                        'title' => 'string', 'link' => 'string',
-                        'image' => 'string', 'updated' => 'int'
+                        'id_member' => 'int',
+                        'position'  => 'int',
+                        'title'     => 'string',
+                        'link'      => 'string',
+                        'image'     => 'string',
+                        'updated'   => 'int'
                     ),
                     array(
-                        $player['id'], $key,
-                        $game['title'], $game['link'],
-                        $game['image'], time()
+                        $player['id'],
+                        $key,
+                        $game['title'],
+                        $game['link'],
+                        $game['image'],
+                        time()
                     ),
                     array()
                 );
@@ -308,11 +320,13 @@ function sxbl_update_member($player)
                 $smcFunc['db_insert']('ignore',
                     '{db_prefix}xbox_games_list',
                     array(
-                        'tid' => 'string', 'title' => 'string',
+                        'tid'   => 'string',
+                        'title' => 'string',
                         'image' => 'string',
                     ),
                     array(
-                        $game['tid'], $game['title'],
+                        $game['tid'],
+                        $game['title'],
                         $game['image'],
                     ),
                     array('tid')
