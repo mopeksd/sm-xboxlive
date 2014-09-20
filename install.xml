@@ -42,7 +42,7 @@
         </operation>
         <operation>
             <search position="after"><![CDATA[		// Are we doing a cast?
-        $field['cast_type'] = empty($field['cast_type']) ? $field['type'] : $field['cast_type'];]]></search>
+		$field['cast_type'] = empty($field['cast_type']) ? $field['type'] : $field['cast_type'];]]></search>
             <add><![CDATA[		// Stick this in here
         if ($key == 'gamertag' && !empty($_POST['gamertag']))
         {

@@ -6,7 +6,7 @@
     <version>3.0.0</version>
     <type>modification</type>
     <install for="2.0-2.0.99">
-        <readme type="file">smf-readme.txt</readme>
+        <readme type="file" parse-bbc="true">smf-readme.txt</readme>
         <database>install.php</database>
         <modification format="xml" type="file">install.xml</modification>
         <require-file name="source/SimpleXBL.php" destination="$sourcedir" />
