@@ -5,7 +5,7 @@
  * @package     SMF
  * @author      Jason Clemons <jason@xboxleaders.com>
  * @file        Subs-SimpleXBL.php
- * @copyright   2014 Jason Clemons <https://github.com/jasonclemons>
+ * @copyright   2014 Jason Clemons <https://github.com/zilladotexe/>
  * @license     MIT
  * @version     3.0.0
  */
@@ -63,15 +63,15 @@ function sxblAdminAreas(&$admin_areas)
     }
 
     $admin_areas['config']['areas'] = array_merge(
-        array_slice($admin_areas['config']['areas'], 0, $counter, TRUE),
+        array_slice($admin_areas['config']['areas'], 0, $counter, true),
         array('simplexbl' => array(
             'label' => $txt['simplexbl'],
-            'function' => create_function(NULL, 'ModifySimpleXBLSettings();'),
+            'function' => 'ModifySimpleXBLSettings',
             'icon' => 'maintain.gif',
             'subsections' => array(
             ),
         )),
-        array_slice($admin_areas['config']['areas'], $counter, NULL, TRUE)
+        array_slice($admin_areas['config']['areas'], $counter, null, true)
     );
 }
 

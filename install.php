@@ -29,6 +29,7 @@ pre_install_check();
 if (!empty($smcFunc['db_query']))
 {
     $hooks = array(
+        'integrate_preload_file' => 'SimpleXBL.php',
         'integrate_load_theme' => 'sxblLoadTheme',
         'integrate_admin_areas' => 'sxblAdminAreas',
         'integrate_menu_buttons' => 'sxblMenuButtons',

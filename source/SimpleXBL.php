@@ -5,7 +5,7 @@
  * @package     SMF
  * @author      Jason Clemons <jason@xboxleaders.com>
  * @file        SimpleXBL.php
- * @copyright   2014 Jason Clemons <https://github.com/jasonclemons>
+ * @copyright   2014 Jason Clemons <https://github.com/zilladotexe/>
  * @license     MIT
  * @version     3.0.0
  */
