@@ -8,6 +8,7 @@
     <install for="2.0-2.0.99">
         <readme type="file" parse-bbc="true">smf-readme.txt</readme>
         <database>install.php</database>
+        <code>addsettings.php</code>
         <modification format="xml" type="file">install.xml</modification>
         <require-file name="source/SimpleXBL.php" destination="$sourcedir" />
         <require-file name="source/Subs-SimpleXBL.php" destination="$sourcedir" />
@@ -19,6 +20,7 @@
     </install>
     <uninstall for="2.0-2.0.99">
         <database>uninstall.php</database>
+        <code>removesettings.php</code>
         <modification format="xml" type="file">uninstall.xml</modification>
         <remove-file name="$sourcedir/SimpleXBL.php" />
         <remove-file name="$sourcedir/Subs-SimpleXBL.php" />

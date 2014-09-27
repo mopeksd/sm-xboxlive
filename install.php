@@ -19,60 +19,6 @@ elseif(!defined('SMF'))
 }
 
 /**
- * Pre-Install Check
- */
-pre_install_check();
-
-/**
- * Install the integration hooks
- */
-if (!empty($smcFunc['db_query']))
-{
-    $hooks = array(
-        'integrate_preload_file' => 'SimpleXBL.php',
-        'integrate_load_theme' => 'sxblLoadTheme',
-        'integrate_admin_areas' => 'sxblAdminAreas',
-        'integrate_menu_buttons' => 'sxblMenuButtons',
-        'integrate_actions' => 'sxblActions',
-    );
-
-    foreach ($hooks as $key => $val)
-    {
-        add_integration_function($key, $val, true);
-    }
-}
-
-function pre_install_check()
-{
-    global $modSettings, $txt;
-
-    if (version_compare(PHP_VERSION, '5.2.0', '<'))
-    {
-        fatal_error('<strong>PHP 5.2 or geater is required to install SimpleXBL.  Please advise your host that PHP4 is no longer maintained and ask that they upgrade you to PHP5.</strong><br />');
-    }
-
-    $char_set = empty($modSettings['global_character_set']) ? $txt['lang_character_set'] : $modSettings['global_character_set'];
-
-    if ($char_set != 'ISO-8859-1' && $char_set != 'UTF-8' && !function_exists('iconv') && !function_exists('mb_convert_encoding') && !function_exists('unicode_decode'))
-    {
-        fatal_error('<strong>You are currently using the ' . $char_set . ' character set and your server does not have functions available to convert to UTF-8.  In order to use this mod, you will either need to convert your board to UTF-8 or ask your host to recompile PHP with the iconv or Multibyte String extensions.</strong>');
-    }
-}
-
-/**
- * Set up the default $modSettings values
- */
-$sxbl_settings = array(
-    'xbl_enable' => '1',
-    'xbl_items_page' => '20',
-    'xbl_required_posts' => '1',
-    'xbl_user_timeout' => '30',
-    'xbl_show_unranked' => '1',
-    'xbl_stat_limit' => '5',
-);
-updateSettings($sxbl_settings);
-
-/**
  * Create the xbox_leaders table and populate it with defaults
  */
 $xbox_leaders_columns = array(

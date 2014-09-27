@@ -31,7 +31,7 @@ function SimpleXBL()
     require_once($sourcedir . '/Subs-SimpleXBL.php');
 
     loadTemplate('SimpleXBL');
-    loadLanguage('SimpleXBL')
+    loadLanguage('SimpleXBL');
 
     $subActions = array(
         'main' => 'Leaderboard',
