@@ -134,6 +134,12 @@ function simplexbl_fetch_data($gamertag)
     else
       $player_data['account_status'] = 'unknown';
 
+    // Determine if Xbox has flagged this gamertag as a cheater
+    if (stripos($string, 'Cheater') !== false)
+      $player_data['cheater'] = true;
+    else
+      $player_data['cheater'] = false;
+
     // Determine the gamertag's gender
     if (stripos($string, 'Male') !== false)
       $player_data['gender'] = 'male';
@@ -167,7 +173,113 @@ function simplexbl_fetch_data($gamertag)
     $player_data['motto']       = simplexbl_find_string($html, '<div id="Motto">', '</div>');
     $player_data['name']        = simplexbl_find_string($html, '<div id="Name">', '</div>');
     $player_data['bio']         = simplexbl_find_string($html, '<div id="Bio">', '</div>');
+
+    // Let's get the first 5 recently played games since that's all we can get...
+    $player_data['recent'] = array();
+
+    // If there's no games, just return what we have
+    if (stripos($html, 'class="NoGames"') !== false)
+      return $player_data;
+
+    // Now, grab all the game data
+    preg_match($html, '~<ol id="PlayedGames.*?>(.*?)<\/ol>~si', $temp_games);
+    preg_match_all($temp_games[1], '~<li.*?>(.*?)<\/li>~si', $temp_data);
+
+    $i = 0;
+    foreach ($temp_data[1] as $data)
+    {
+      $player_data['recent'][$i]['tid']                 = simplexbl_find_string($data, 'titleId=', '&');
+      $player_data['recent'][$i]['url']                 = simplexbl_find_string($data, '<a href="', '"');
+      $player_data['recent'][$i]['image']               = simplexbl_find_string($data, '<img src="', '" alt=');
+      $player_data['recent'][$i]['title']               = simplexbl_find_string($data, '<span class="Title">', '</span>');
+      $player_data['recent'][$i]['last_played']         = simplexbl_find_string($data, '<span class="LastPlayed">', '</span>');
+      $player_data['recent'][$i]['gamerscore']          = simplexbl_find_string($data, '<span class="EarnedGamerscore">', '</span>');
+      $player_data['recent'][$i]['total_gamerscore']    = simplexbl_find_string($data, '<span class="AvailableGamerscore">', '</span>');
+      $player_data['recent'][$i]['achievements']        = simplexbl_find_string($data, '<span class="EarnedAchievements">', '</span>');
+      $player_data['recent'][$i]['total_achievements']  = simplexbl_find_string($data, '<span class="AvailableAchievements">', '</span>');
+      $player_data['recent'][$i]['percent_complete']    = simplexbl_find_string($data, '<span class="PercentageComplete">', '</span>');
+    }
+
+    unset($temp_data);
+    unset($temp_games);
+
+    $player_data['recent'] = serialize($player_data['recent']);
+  }
+
+  return $player_data;
+}
+
+/**
+ * Update the database data for a gamertag
+ */
+function simplexbl_update_member($player)
+{
+  global $context, $smcFunc;
+
+  // Make sure the member exists
+  if ($player['exists'])
+  {
+    $smcFunc['db_query']('', '
+      UPDATE {db_prefix}xbox_leaders
+      SET gamertag = {string:gamertag}, account_status = {int:account_status}, gender = {string:gender}, cheater = {int:cheater},
+        avatar = {string:avatar}, reputation = {int:reputation}, gamerscore = {int:gamerscore}, location = {string:location},
+        motto = {string:motto}, name = {string:name}, bio = {string:bio}, updated = {int:updated}
+      WHERE id_member = {int:id_member}',
+      array(
+        'member' => $player['id'], 'gamertag' => $player['gamertag'], 'account_status' => $player['account_status'],
+        'gender' => $player['gender'], 'cheater' => $player['cheater'], 'avatar' => $player['avatar'], 'reputation' => $player['reputation'],
+        'gamerscore' => $player['gamerscore'], 'location' => $player['location'], 'motto' => $player['motto'], 'name' => $player['name'],
+        'bio' => $player['bio'], 'updated' => time(),
+      ),
+    );
+
+    // If there are games to insert, do it here
+    if (!empty($player['recent']))
+    {
+      $smcFunc['db_query']('', '
+        UPDATE {db_prefix}xbox_leaders
+        SET recent = {string:recent}
+        WHERE id_member = {int:id_member}',
+        array(
+          'recent' => $player['recent'],
+          'id_member' => $player['id'],
+        ),
+      );
+
+      // Update the games list
+      $games = unserialize($player['recent']);
+      foreach ($games as $key => $game)
+      {
+        $game['title'] = simplexbl_clean_string($game['title']);
+
+        $smcFunc['db_insert']('ignore',
+          '{db_prefix}xbox_games',
+          array(
+            'id_member' => 'int', 'position' => 'int', 'title' => 'string',
+            'link' => 'string', 'image' => 'string', 'updated' => 'int',
+          ),
+          array(
+            $player['id'], $key, $game['title'],
+            $game['link'], $game['image'], time(),
+          ),
+        );
+
+        // Update the full game archive
+        $smcFunc['db_insert']('ignore',
+          '{db_prefix}xbox_games_list',
+          array(
+            'tid' => 'string', 'title' =>'string', 'image' => 'string',
+          ),
+          array(
+            $game['tid'], $game['title'], $game['image'],
+          ),
+          array('tid'),
+        );
+      }
+    }
   }
 }
+
+
 
 ?>
